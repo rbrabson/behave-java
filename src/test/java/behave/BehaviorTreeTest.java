@@ -9,6 +9,305 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class BehaviorTreeTest {
     @Test
+    void testCompositeAllConditionsRunning() {
+        Condition running = new Condition(() -> Status.RUNNING);
+        Action a = new Action(() -> Status.SUCCESS);
+        Composite composite = new Composite(Arrays.asList(running), a);
+        assertEquals(Status.RUNNING, composite.tick());
+    }
+
+    @Test
+    void testCompositeAllConditionsNullList() {
+        Composite composite = new Composite(null, null);
+        assertEquals(Status.FAILURE, composite.tick());
+    }
+
+    @Test
+    void testCompositeEmptyConditionsWithNullChild() {
+        Composite composite = new Composite(Arrays.asList(), null);
+        assertEquals(Status.FAILURE, composite.tick());
+    }
+
+    @Test
+    void testCompositeEmptyConditionsWithChild() {
+        Action a = new Action(() -> Status.SUCCESS);
+        Composite composite = new Composite(Arrays.asList(), a);
+        assertEquals(Status.SUCCESS, composite.tick());
+    }
+
+    @Test
+    void testParallelMinSuccessZero() {
+        Action a1 = new Action(() -> Status.SUCCESS);
+        Parallel parallel = new Parallel(Arrays.asList(a1), 0);
+        assertEquals(Status.SUCCESS, parallel.tick());
+    }
+
+    @Test
+    void testParallelAllSuccess() {
+        Action a1 = new Action(() -> Status.SUCCESS);
+        Action a2 = new Action(() -> Status.SUCCESS);
+        Parallel parallel = new Parallel(Arrays.asList(a1, a2), 2);
+        assertEquals(Status.SUCCESS, parallel.tick());
+    }
+
+    @Test
+    void testParallelNotEnoughPossibleSuccesses() {
+        Action fail = new Action(() -> Status.FAILURE);
+        Action running = new Action(() -> Status.RUNNING);
+        Parallel parallel = new Parallel(Arrays.asList(fail, running), 2);
+        assertEquals(Status.RUNNING, parallel.tick());
+    }
+
+    @Test
+    void testSequenceAllReady() {
+        Action ready = new Action(() -> Status.READY);
+        Sequence sequence = new Sequence(Arrays.asList(ready, ready));
+        assertEquals(Status.READY, sequence.tick());
+    }
+
+    @Test
+    void testSequenceDefaultCase() {
+        Node badNode = new Node() {
+            @Override
+            public Status tick() {
+                return null;
+            }
+
+            @Override
+            public Status reset() {
+                return null;
+            }
+
+            @Override
+            public Status status() {
+                return null;
+            }
+
+            @Override
+            public String toString() {
+                return "bad";
+            }
+        };
+        Sequence sequence = new Sequence(Arrays.asList(badNode));
+        assertEquals(Status.FAILURE, sequence.tick());
+    }
+
+    @Test
+    void testSelectorAllReady() {
+        Action ready = new Action(() -> Status.READY);
+        Selector selector = new Selector(Arrays.asList(ready, ready));
+        assertEquals(Status.READY, selector.tick());
+    }
+
+    @Test
+    void testSelectorDefaultCase() {
+        Node badNode = new Node() {
+            @Override
+            public Status tick() {
+                return null;
+            }
+
+            @Override
+            public Status reset() {
+                return null;
+            }
+
+            @Override
+            public Status status() {
+                return null;
+            }
+
+            @Override
+            public String toString() {
+                return "bad";
+            }
+        };
+        Selector selector = new Selector(Arrays.asList(badNode));
+        assertEquals(Status.FAILURE, selector.tick());
+    }
+
+    @Test
+    void testRepeatNMaxCountNegative() {
+        Action a = new Action(() -> Status.SUCCESS);
+        RepeatN repeatN = new RepeatN(a, -1);
+        assertEquals(Status.RUNNING, repeatN.tick());
+    }
+
+    @Test
+    void testRepeatNChildReturnsFailure() {
+        Action fail = new Action(() -> Status.FAILURE);
+        RepeatN repeatN = new RepeatN(fail, 2);
+        assertEquals(Status.RUNNING, repeatN.tick());
+        assertEquals(Status.SUCCESS, repeatN.tick());
+    }
+
+    @Test
+    void testRetryChildReturnsReady() {
+        Action ready = new Action(() -> Status.READY);
+        Retry retry = new Retry(ready);
+        assertEquals(Status.RUNNING, retry.tick());
+    }
+
+    @Test
+    void testWhileFailureChildReturnsReady() {
+        Action ready = new Action(() -> Status.READY);
+        WhileFailure whileFailure = new WhileFailure(ready);
+        assertEquals(Status.RUNNING, whileFailure.tick());
+    }
+
+    @Test
+    void testWhileSuccessChildReturnsReady() {
+        Action ready = new Action(() -> Status.READY);
+        WhileSuccess whileSuccess = new WhileSuccess(ready);
+        assertEquals(Status.RUNNING, whileSuccess.tick());
+    }
+
+    @Test
+    void testLogDefaultLevelAndNullMessage() {
+        Action a = new Action(() -> Status.SUCCESS);
+        Log log = new Log(a);
+        assertEquals(Status.SUCCESS, log.tick());
+    }
+
+    @Test
+    void testSequenceAllSuccess() {
+        Action a1 = new Action(() -> Status.SUCCESS);
+        Action a2 = new Action(() -> Status.SUCCESS);
+        Sequence sequence = new Sequence(Arrays.asList(a1, a2));
+        assertEquals(Status.SUCCESS, sequence.tick());
+    }
+
+    @Test
+    void testSequenceWithFailure() {
+        Action a1 = new Action(() -> Status.SUCCESS);
+        Action a2 = new Action(() -> Status.FAILURE);
+        Sequence sequence = new Sequence(Arrays.asList(a1, a2));
+        assertEquals(Status.FAILURE, sequence.tick());
+    }
+
+    @Test
+    void testSequenceWithRunning() {
+        Action a1 = new Action(() -> Status.SUCCESS);
+        Action a2 = new Action(() -> Status.RUNNING);
+        Sequence sequence = new Sequence(Arrays.asList(a1, a2));
+        assertEquals(Status.RUNNING, sequence.tick());
+    }
+
+    @Test
+    void testSelectorAllFailure() {
+        Action a1 = new Action(() -> Status.FAILURE);
+        Action a2 = new Action(() -> Status.FAILURE);
+        Selector selector = new Selector(Arrays.asList(a1, a2));
+        assertEquals(Status.FAILURE, selector.tick());
+    }
+
+    @Test
+    void testSelectorWithSuccess() {
+        Action a1 = new Action(() -> Status.FAILURE);
+        Action a2 = new Action(() -> Status.SUCCESS);
+        Selector selector = new Selector(Arrays.asList(a1, a2));
+        assertEquals(Status.SUCCESS, selector.tick());
+    }
+
+    @Test
+    void testSelectorWithRunning() {
+        Action a1 = new Action(() -> Status.FAILURE);
+        Action a2 = new Action(() -> Status.RUNNING);
+        Selector selector = new Selector(Arrays.asList(a1, a2));
+        assertEquals(Status.RUNNING, selector.tick());
+    }
+
+    @Test
+    void testRepeatNZeroMaxCount() {
+        Action a = new Action(() -> Status.SUCCESS);
+        RepeatN repeatN = new RepeatN(a, 0);
+        assertEquals(Status.RUNNING, repeatN.tick());
+    }
+
+    @Test
+    void testRepeatNRunningChild() {
+        Action running = new Action(() -> Status.RUNNING);
+        RepeatN repeatN = new RepeatN(running, 2);
+        assertEquals(Status.RUNNING, repeatN.tick());
+    }
+
+    @Test
+    void testRepeatNNullChild() {
+        RepeatN repeatN = new RepeatN(null, 2);
+        assertEquals(Status.FAILURE, repeatN.tick());
+    }
+
+    @Test
+    void testRetrySuccessAfterFailure() {
+        AtomicInteger count = new AtomicInteger(0);
+        Action a = new Action(() -> count.incrementAndGet() < 2 ? Status.FAILURE : Status.SUCCESS);
+        Retry retry = new Retry(a);
+        assertEquals(Status.RUNNING, retry.tick());
+        assertEquals(Status.SUCCESS, retry.tick());
+    }
+
+    @Test
+    void testRetryRunning() {
+        Action running = new Action(() -> Status.RUNNING);
+        Retry retry = new Retry(running);
+        assertEquals(Status.RUNNING, retry.tick());
+    }
+
+    @Test
+    void testRetryNullChild() {
+        Retry retry = new Retry(null);
+        assertEquals(Status.FAILURE, retry.tick());
+    }
+
+    @Test
+    void testWithTimeoutSuccess() {
+        Action success = new Action(() -> Status.SUCCESS);
+        WithTimeout timeout = new WithTimeout(success, Duration.ofMillis(100));
+        assertEquals(Status.SUCCESS, timeout.tick());
+    }
+
+    @Test
+    void testWithTimeoutFailure() {
+        Action fail = new Action(() -> Status.FAILURE);
+        WithTimeout timeout = new WithTimeout(fail, Duration.ofMillis(100));
+        assertEquals(Status.FAILURE, timeout.tick());
+    }
+
+    @Test
+    void testWithTimeoutNullChild() {
+        WithTimeout timeout = new WithTimeout(null, Duration.ofMillis(100));
+        assertEquals(Status.FAILURE, timeout.tick());
+    }
+
+    @Test
+    void testActionAllStatuses() {
+        for (Status s : Status.values()) {
+            Action a = new Action(() -> s);
+            assertEquals(s, a.tick());
+        }
+    }
+
+    @Test
+    void testActionNullFunction() {
+        Action a = new Action(null);
+        assertEquals(Status.FAILURE, a.tick());
+    }
+
+    @Test
+    void testConditionAllStatuses() {
+        for (Status s : Status.values()) {
+            Condition c = new Condition(() -> s);
+            assertEquals(s, c.tick());
+        }
+    }
+
+    @Test
+    void testConditionNullFunction() {
+        Condition c = new Condition(null);
+        assertEquals(Status.FAILURE, c.tick());
+    }
+
+    @Test
     void testRepeatDecoratorSuccessAndFailure() {
         AtomicInteger count = new AtomicInteger(0);
         Action succeedTwice = new Action(() -> count.incrementAndGet() < 3 ? Status.SUCCESS : Status.FAILURE);
