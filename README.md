@@ -1,3 +1,5 @@
+# Behavior Trees
+
 ## Best Practices for Using Behavior Trees
 
 Here are some tips and patterns for getting the most out of the behavior tree framework:
