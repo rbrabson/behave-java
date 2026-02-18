@@ -68,7 +68,7 @@ public class Log implements Node {
         }
     }
 
-    //
+    // Helper method to get the type of the child node for logging purposes.
     private String getChildType() {
         return (child != null) ? child.getClass().getSimpleName() : "null";
     }
