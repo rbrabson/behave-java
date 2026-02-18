@@ -226,11 +226,6 @@ behave-java/
 │   │           ├── WhileFailure.java
 │   │           ├── WhileSuccess.java
 │   │           └── WithTimeout.java
-│   └── test/
-│       └── java/
-│           └── test/
-│               └── behave/
-│                   └── BehaviorTreeTest.java
 ```
 
 - Core implementation: `src/main/java/behave/`
