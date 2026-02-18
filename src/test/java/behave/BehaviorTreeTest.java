@@ -8,11 +8,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class BehaviorTreeTest {
-    static class TestClass {
+    static class RunForNTicks {
         int numTicksToRun = 0;
         int timesTicked = 0;
 
-        TestClass(int numTicks) {
+        RunForNTicks(int numTicks) {
             this.numTicksToRun = numTicks;
         }
 
@@ -24,8 +24,8 @@ public class BehaviorTreeTest {
 
     @Test
     void testUsingClassForAction() {
-        TestClass tc = new TestClass(5);
-        Action runTC = new Action(() -> tc.run());
+        RunForNTicks runForNTicks = new RunForNTicks(5);
+        Action runTC = new Action(() -> runForNTicks.run());
         BehaviorTree tree = new BehaviorTree(runTC);
         while (tree.tick() == Status.RUNNING) {
             // Loop until the tree returns SUCCESS

@@ -145,14 +145,44 @@ BehaviorTree tree = new BehaviorTree(new Action(() -> Status.SUCCESS));
 tree.tick(); // returns Status.SUCCESS
 ```
 
-### Action
-
-```java
-## Usage Examples
-
 Below are real-world inspired examples demonstrating how to use the behave package to model practical behavior trees.
 
-### Example 1: Simple AI Agent (Patrol or Attack)
+### Example 1: Using BehaviorTree with a Class
+
+This example demonstrates how to use a behavior tree to manage the state of a custom class, similar to the `testUsingClassForAction` test case:
+
+```java
+import behave.*;
+
+// A class whose method will be used as an action in the behavior tree
+class Counter {
+ int numTicks;
+ int ticks = 0;
+
+ Counter(int numTicks) {
+  this.numTicks = numTicks;
+ }
+
+ Status tickUntilDone() {
+  ticks++;
+  return ticks >= numTicks ? Status.SUCCESS : Status.RUNNING;
+ }
+}
+
+public class Example {
+ public static void main(String[] args) {
+  Counter counter = new Counter(5);
+  Action action = new Action(() -> counter.tickUntilDone());
+  BehaviorTree tree = new BehaviorTree(action);
+  while (tree.tick() == Status.RUNNING) {
+   // Loop until the tree returns SUCCESS
+  }
+  System.out.println("Final status: " + tree.tick()); // Should print SUCCESS
+ }
+}
+```
+
+### Example 2: Simple AI Agent (Patrol or Attack)
 
 ```java
 import behave.*;
@@ -182,7 +212,7 @@ Status attackEnemy() { /* ... */ return Status.SUCCESS; }
 Status patrolArea() { /* ... */ return Status.SUCCESS; }
 ```
 
-### Example 2: Retry and Timeout for Robust Actions
+### Example 3: Retry and Timeout for Robust Actions
 
 ```java
 import behave.*;
@@ -200,7 +230,7 @@ BehaviorTree tree = new BehaviorTree(timeout);
 tree.tick();
 ```
 
-### Example 3: Parallel Node for Multi-Tasking
+### Example 4: Parallel Node for Multi-Tasking
 
 ```java
 import behave.*;
@@ -219,7 +249,7 @@ Status scanForThreats() { /* ... */ return Status.SUCCESS; }
 Status moveToWaypoint() { /* ... */ return Status.SUCCESS; }
 ```
 
-### Example 4: Logging and Decorators
+### Example 5: Logging and Decorators
 
 ```java
 import behave.*;
@@ -233,7 +263,7 @@ BehaviorTree tree = new BehaviorTree(alwaysSuccess);
 tree.tick();
 ```
 
-### Example 5: Custom Composite with Conditions
+### Example 6: Custom Composite with Conditions
 
 ```java
 import behave.*;
