@@ -31,7 +31,7 @@ public class BehaviorTreeTest {
         while (tree.tick() == Status.RUNNING) {
             // Loop until the tree returns SUCCESS
         }
-        assertEquals(Status.SUCCESS, tree.tick());
+        assertEquals(Status.SUCCESS, tree.status());
     }
 
     // --- Additional targeted tests for uncovered branches in decorator nodes ---
