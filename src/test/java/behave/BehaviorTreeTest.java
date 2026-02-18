@@ -8,6 +8,31 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class BehaviorTreeTest {
+    static class TestClass {
+        int numTicksToRun = 0;
+        int timesTicked = 0;
+
+        TestClass(int numTicks) {
+            this.numTicksToRun = numTicks;
+        }
+
+        Status run() {
+            timesTicked++;
+            return timesTicked >= numTicksToRun ? Status.SUCCESS : Status.RUNNING;
+        }
+    }
+
+    @Test
+    void testUsingClassForAction() {
+        TestClass tc = new TestClass(5);
+        Action runTC = new Action(() -> tc.run());
+        BehaviorTree tree = new BehaviorTree(runTC);
+        while (tree.tick() == Status.RUNNING) {
+            // Loop until the tree returns SUCCESS
+        }
+        assertEquals(Status.SUCCESS, tree.tick());
+    }
+
     // --- Additional targeted tests for uncovered branches in decorator nodes ---
     @Test
     void testInvertAllBranches() {
