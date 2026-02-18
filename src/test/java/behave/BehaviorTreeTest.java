@@ -9,6 +9,87 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class BehaviorTreeTest {
     @Test
+    void testRepeatDecoratorSuccessAndFailure() {
+        AtomicInteger count = new AtomicInteger(0);
+        Action succeedTwice = new Action(() -> count.incrementAndGet() < 3 ? Status.SUCCESS : Status.FAILURE);
+        Repeat repeat = new Repeat(succeedTwice);
+        assertEquals(Status.RUNNING, repeat.tick());
+        assertEquals(Status.RUNNING, repeat.tick());
+        assertEquals(Status.FAILURE, repeat.tick());
+        repeat.reset();
+        assertEquals(Status.READY, repeat.status());
+    }
+
+    @Test
+    void testRepeatDecoratorWithNullChild() {
+        Repeat repeat = new Repeat(null);
+        assertEquals(Status.FAILURE, repeat.tick());
+    }
+
+    @Test
+    void testCompositeWithNoConditionsAndNoChild() {
+        Composite composite = new Composite(null, null);
+        assertEquals(Status.FAILURE, composite.tick());
+    }
+
+    @Test
+    void testCompositeWithNoConditionsButWithChild() {
+        Action a = new Action(() -> Status.SUCCESS);
+        Composite composite = new Composite(null, a);
+        assertEquals(Status.SUCCESS, composite.tick());
+    }
+
+    @Test
+    void testCompositeWithFailingCondition() {
+        Condition fail = new Condition(() -> Status.FAILURE);
+        Action a = new Action(() -> Status.SUCCESS);
+        Composite composite = new Composite(Arrays.asList(fail), a);
+        assertEquals(Status.FAILURE, composite.tick());
+    }
+
+    @Test
+    void testParallelAllFail() {
+        Action fail1 = new Action(() -> Status.FAILURE);
+        Action fail2 = new Action(() -> Status.FAILURE);
+        Parallel parallel = new Parallel(Arrays.asList(fail1, fail2), 1);
+        assertEquals(Status.FAILURE, parallel.tick());
+    }
+
+    @Test
+    void testParallelAllRunning() {
+        Action running1 = new Action(() -> Status.RUNNING);
+        Action running2 = new Action(() -> Status.RUNNING);
+        Parallel parallel = new Parallel(Arrays.asList(running1, running2), 1);
+        assertEquals(Status.RUNNING, parallel.tick());
+    }
+
+    @Test
+    void testParallelEmptyChildren() {
+        Parallel parallel = new Parallel(Arrays.asList(), 1);
+        assertEquals(Status.SUCCESS, parallel.tick());
+    }
+
+    @Test
+    void testParallelMinSuccessGreaterThanChildren() {
+        Action success = new Action(() -> Status.SUCCESS);
+        Parallel parallel = new Parallel(Arrays.asList(success), 5);
+        assertEquals(Status.SUCCESS, parallel.tick());
+    }
+
+    @Test
+    void testLogWithNullChild() {
+        Log log = new Log(null, "Should warn");
+        assertEquals(Status.FAILURE, log.tick());
+    }
+
+    @Test
+    void testLogWithCustomLevel() {
+        Action a = new Action(() -> Status.SUCCESS);
+        Log log = new Log(a, "Custom", java.util.logging.Level.SEVERE);
+        assertEquals(Status.SUCCESS, log.tick());
+    }
+
+    @Test
     void testActionSuccess() {
         Action action = new Action(() -> Status.SUCCESS);
         assertEquals(Status.SUCCESS, action.tick());
