@@ -89,10 +89,6 @@ behave-java/
 │   │           └── WithTimeout.java
 ```
 
-## License
-
-MIT
-
 ## Usage Examples
 
 Below are examples demonstrating how to use each class in the behave package. These are minimal examples; see the test suite for more advanced usage.
@@ -260,49 +256,6 @@ A Java implementation of a flexible behavior tree framework, inspired by the Go 
 - Action, Condition, Composite, Selector, Sequence, Parallel nodes
 - Decorators: Retry, Repeat, Invert, AlwaysSuccess, AlwaysFailure, RepeatN, Forever, WhileSuccess, WhileFailure, WithTimeout, Log
 - Easy to extend and integrate
-
-## Usage
-
-## Repository Structure
-
-``` bash
-behave-java/
-├── pom.xml
-├── README.md
-├── src/
-│   ├── main/
-│   │   └── java/
-│   │       └── behave/
-│   │           ├── Action.java
-│   │           ├── AlwaysFailure.java
-│   │           ├── AlwaysSuccess.java
-│   │           ├── BehaviorTree.java
-│   │           ├── Composite.java
-│   │           ├── Condition.java
-│   │           ├── Forever.java
-│   │           ├── Invert.java
-│   │           ├── Log.java
-│   │           ├── Node.java
-│   │           ├── Parallel.java
-│   │           ├── Repeat.java
-│   │           ├── RepeatN.java
-│   │           ├── Retry.java
-│   │           ├── Selector.java
-│   │           ├── Sequence.java
-│   │           ├── Status.java
-│   │           ├── WhileFailure.java
-│   │           ├── WhileSuccess.java
-│   │           └── WithTimeout.java
-```
-
-- Core implementation: `src/main/java/behave/`
-- Unit tests: `src/test/java/test/behave/BehaviorTreeTest.java`
-
-Build and test with Maven:
-
-```sh
-mvn clean test
-```
 
 ## License
 
