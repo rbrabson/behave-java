@@ -26,7 +26,7 @@ public class BehaviorTreeTest {
     @Test
     void testUsingClassForAction() {
         Counter counter = new Counter(5);
-        Action runTC = new Action((counter::tickUntilDone));
+        Action runTC = new Action(counter::tickUntilDone);
         BehaviorTree tree = new BehaviorTree(runTC);
         while (tree.tick() == Status.RUNNING) {
             // Loop until the tree returns SUCCESS
