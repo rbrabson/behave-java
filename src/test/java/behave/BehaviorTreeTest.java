@@ -8,6 +8,158 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class BehaviorTreeTest {
+    // --- Additional tests for 80%+ coverage ---
+    @Test
+    void testCompositeToStringAndReset() {
+        Condition c1 = new Condition(() -> Status.SUCCESS);
+        Action a = new Action(() -> Status.SUCCESS);
+        Composite composite = new Composite(Arrays.asList(c1), a);
+        composite.tick();
+        assertTrue(composite.toString().contains("Composite"));
+        assertEquals(Status.READY, composite.reset());
+    }
+
+    @Test
+    void testParallelToStringAndReset() {
+        Action a1 = new Action(() -> Status.SUCCESS);
+        Action a2 = new Action(() -> Status.FAILURE);
+        Parallel parallel = new Parallel(Arrays.asList(a1, a2), 1);
+        parallel.tick();
+        assertTrue(parallel.toString().contains("Parallel"));
+        assertEquals(Status.READY, parallel.reset());
+    }
+
+    @Test
+    void testSequenceToStringAndReset() {
+        Action a1 = new Action(() -> Status.SUCCESS);
+        Sequence sequence = new Sequence(Arrays.asList(a1));
+        sequence.tick();
+        assertTrue(sequence.toString().contains("Sequence"));
+        assertEquals(Status.READY, sequence.reset());
+    }
+
+    @Test
+    void testSelectorToStringAndReset() {
+        Action a1 = new Action(() -> Status.FAILURE);
+        Selector selector = new Selector(Arrays.asList(a1));
+        selector.tick();
+        assertTrue(selector.toString().contains("Selector"));
+        assertEquals(Status.READY, selector.reset());
+    }
+
+    @Test
+    void testRepeatNToStringAndReset() {
+        Action a = new Action(() -> Status.SUCCESS);
+        RepeatN repeatN = new RepeatN(a, 2);
+        repeatN.tick();
+        assertTrue(repeatN.toString().contains("RepeatN"));
+        assertEquals(Status.READY, repeatN.reset());
+    }
+
+    @Test
+    void testRetryToStringAndReset() {
+        Action a = new Action(() -> Status.FAILURE);
+        Retry retry = new Retry(a);
+        retry.tick();
+        assertTrue(retry.toString().contains("Retry"));
+        assertEquals(Status.READY, retry.reset());
+    }
+
+    @Test
+    void testWhileFailureToStringAndReset() {
+        Action a = new Action(() -> Status.FAILURE);
+        WhileFailure wf = new WhileFailure(a);
+        wf.tick();
+        assertTrue(wf.toString().contains("WhileFailure"));
+        assertEquals(Status.READY, wf.reset());
+    }
+
+    @Test
+    void testWhileSuccessToStringAndReset() {
+        Action a = new Action(() -> Status.SUCCESS);
+        WhileSuccess ws = new WhileSuccess(a);
+        ws.tick();
+        assertTrue(ws.toString().contains("WhileSuccess"));
+        assertEquals(Status.READY, ws.reset());
+    }
+
+    @Test
+    void testLogToStringAndReset() {
+        Action a = new Action(() -> Status.SUCCESS);
+        Log log = new Log(a, "msg");
+        log.tick();
+        assertTrue(log.toString().contains("Log"));
+        assertEquals(Status.READY, log.reset());
+    }
+
+    @Test
+    void testActionToStringAndReset() {
+        Action a = new Action(() -> Status.SUCCESS);
+        a.tick();
+        assertTrue(a.toString().contains("Action"));
+        assertEquals(Status.READY, a.reset());
+    }
+
+    @Test
+    void testConditionToStringAndReset() {
+        Condition c = new Condition(() -> Status.SUCCESS);
+        c.tick();
+        assertTrue(c.toString().contains("Condition"));
+        assertEquals(Status.READY, c.reset());
+    }
+
+    @Test
+    void testAlwaysSuccessToStringAndReset() {
+        Action a = new Action(() -> Status.FAILURE);
+        AlwaysSuccess as = new AlwaysSuccess(a);
+        as.tick();
+        assertTrue(as.toString().contains("AlwaysSuccess"));
+        assertEquals(Status.READY, as.reset());
+    }
+
+    @Test
+    void testAlwaysFailureToStringAndReset() {
+        Action a = new Action(() -> Status.SUCCESS);
+        AlwaysFailure af = new AlwaysFailure(a);
+        af.tick();
+        assertTrue(af.toString().contains("AlwaysFailure"));
+        assertEquals(Status.READY, af.reset());
+    }
+
+    @Test
+    void testForeverToStringAndReset() {
+        Action a = new Action(() -> Status.SUCCESS);
+        Forever f = new Forever(a);
+        f.tick();
+        assertTrue(f.toString().contains("Forever"));
+        assertEquals(Status.READY, f.reset());
+    }
+
+    @Test
+    void testWithTimeoutToStringAndReset() {
+        Action a = new Action(() -> Status.SUCCESS);
+        WithTimeout wt = new WithTimeout(a, Duration.ofMillis(10));
+        wt.tick();
+        assertTrue(wt.toString().contains("WithTimeout"));
+        assertEquals(Status.READY, wt.reset());
+    }
+
+    @Test
+    void testBehaviorTreeToStringAndReset() {
+        Action a = new Action(() -> Status.SUCCESS);
+        BehaviorTree tree = new BehaviorTree(a);
+        tree.tick();
+        assertTrue(tree.toString().contains("BehaviorTree"));
+        assertEquals(Status.READY, tree.reset());
+    }
+
+    @Test
+    void testStatusToStringAllValues() {
+        for (Status s : Status.values()) {
+            assertNotNull(s.toString());
+        }
+    }
+
     @Test
     void testCompositeAllConditionsRunning() {
         Condition running = new Condition(() -> Status.RUNNING);
