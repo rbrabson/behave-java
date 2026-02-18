@@ -58,8 +58,6 @@ Condition isAtTarget = new Condition(() -> player.isAt(targetPosition) ? Status.
 
 By following these patterns, you can build robust, maintainable, and extensible behavior trees for AI, robotics, workflow engines, and more.
 
-# Behavior Tree
-
 ## Usage Examples
 
 Below are examples demonstrating how to use each class in the behave package. These are minimal examples; see the test suite for more advanced usage.
