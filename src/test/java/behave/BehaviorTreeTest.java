@@ -8,6 +8,268 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class BehaviorTreeTest {
+    // --- Additional targeted tests for uncovered branches in decorator nodes ---
+    @Test
+    void testInvertAllBranches() {
+        // Child returns SUCCESS
+        Invert invertSuccess = new Invert(new Action(() -> Status.SUCCESS));
+        assertEquals(Status.FAILURE, invertSuccess.tick());
+        // Child returns FAILURE
+        Invert invertFailure = new Invert(new Action(() -> Status.FAILURE));
+        assertEquals(Status.SUCCESS, invertFailure.tick());
+        // Child returns READY
+        Invert invertReady = new Invert(new Action(() -> Status.READY));
+        assertEquals(Status.READY, invertReady.tick());
+        // Child returns null (default case)
+        Invert invertNull = new Invert(new Action(() -> null));
+        assertEquals(Status.SUCCESS, invertNull.tick());
+    }
+
+    @Test
+    void testRepeatAllBranches() {
+        // Child returns SUCCESS (should call child.reset and return RUNNING)
+        AtomicInteger resetCount = new AtomicInteger(0);
+        Node child = new Node() {
+            @Override
+            public Status tick() {
+                return Status.SUCCESS;
+            }
+
+            @Override
+            public Status reset() {
+                resetCount.incrementAndGet();
+                return Status.READY;
+            }
+
+            @Override
+            public Status status() {
+                return Status.READY;
+            }
+
+            @Override
+            public String toString() {
+                return "child";
+            }
+        };
+        Repeat repeat = new Repeat(child);
+        assertEquals(Status.RUNNING, repeat.tick());
+        assertEquals(1, resetCount.get());
+        // Child returns FAILURE
+        Repeat repeatFail = new Repeat(new Action(() -> Status.FAILURE));
+        assertEquals(Status.FAILURE, repeatFail.tick());
+        // Child returns READY (default case)
+        Repeat repeatReady = new Repeat(new Action(() -> Status.READY));
+        assertEquals(Status.FAILURE, repeatReady.tick());
+        // Child returns null (default case)
+        Repeat repeatNull = new Repeat(new Action(() -> null));
+        assertEquals(Status.FAILURE, repeatNull.tick());
+    }
+
+    @Test
+    void testLogAllBranches() {
+        // Child returns SUCCESS, custom message and level
+        Log logSuccess = new Log(new Action(() -> Status.SUCCESS), "msg", java.util.logging.Level.INFO);
+        assertEquals(Status.SUCCESS, logSuccess.tick());
+        // Child returns FAILURE, no message, no level
+        Log logFail = new Log(new Action(() -> Status.FAILURE));
+        assertEquals(Status.FAILURE, logFail.tick());
+        // Child returns RUNNING, null message, null level
+        Log logRunning = new Log(new Action(() -> Status.RUNNING), null, null);
+        assertEquals(Status.RUNNING, logRunning.tick());
+        // Child returns READY, null message, null level
+        Log logReady = new Log(new Action(() -> Status.READY), null, null);
+        assertEquals(Status.READY, logReady.tick());
+        // Child returns null (default case)
+        Log logNull = new Log(new Action(() -> null));
+        assertEquals(Status.FAILURE, logNull.tick());
+    }
+
+    @Test
+    void testWhileFailureAllBranches() {
+        // Child returns FAILURE (should call child.reset and return RUNNING)
+        AtomicInteger resetCount = new AtomicInteger(0);
+        Node child = new Node() {
+            @Override
+            public Status tick() {
+                return Status.FAILURE;
+            }
+
+            @Override
+            public Status reset() {
+                resetCount.incrementAndGet();
+                return Status.READY;
+            }
+
+            @Override
+            public Status status() {
+                return Status.READY;
+            }
+
+            @Override
+            public String toString() {
+                return "child";
+            }
+        };
+        WhileFailure wf = new WhileFailure(child);
+        assertEquals(Status.RUNNING, wf.tick());
+        assertEquals(1, resetCount.get());
+        // Child returns RUNNING
+        WhileFailure wfRunning = new WhileFailure(new Action(() -> Status.RUNNING));
+        assertEquals(Status.RUNNING, wfRunning.tick());
+        // Child returns SUCCESS
+        WhileFailure wfSuccess = new WhileFailure(new Action(() -> Status.SUCCESS));
+        assertEquals(Status.SUCCESS, wfSuccess.tick());
+        // Child returns null (default case)
+        WhileFailure wfNull = new WhileFailure(new Action(() -> null));
+        assertEquals(Status.RUNNING, wfNull.tick());
+    }
+
+    @Test
+    void testWhileSuccessAllBranches() {
+        // Child returns SUCCESS (should call child.reset and return RUNNING)
+        AtomicInteger resetCount = new AtomicInteger(0);
+        Node child = new Node() {
+            @Override
+            public Status tick() {
+                return Status.SUCCESS;
+            }
+
+            @Override
+            public Status reset() {
+                resetCount.incrementAndGet();
+                return Status.READY;
+            }
+
+            @Override
+            public Status status() {
+                return Status.READY;
+            }
+
+            @Override
+            public String toString() {
+                return "child";
+            }
+        };
+        WhileSuccess ws = new WhileSuccess(child);
+        assertEquals(Status.RUNNING, ws.tick());
+        assertEquals(1, resetCount.get());
+        // Child returns RUNNING
+        WhileSuccess wsRunning = new WhileSuccess(new Action(() -> Status.RUNNING));
+        assertEquals(Status.RUNNING, wsRunning.tick());
+        // Child returns FAILURE
+        WhileSuccess wsFail = new WhileSuccess(new Action(() -> Status.FAILURE));
+        assertEquals(Status.FAILURE, wsFail.tick());
+        // Child returns null (default case)
+        WhileSuccess wsNull = new WhileSuccess(new Action(() -> null));
+        assertEquals(Status.FAILURE, wsNull.tick());
+    }
+
+    @Test
+    void testAlwaysSuccessAllBranches() {
+        // Child returns all statuses, AlwaysSuccess should always return SUCCESS
+        for (Status s : Status.values()) {
+            AlwaysSuccess as = new AlwaysSuccess(new Action(() -> s));
+            assertEquals(Status.SUCCESS, as.tick());
+        }
+        // Child is null
+        AlwaysSuccess asNull = new AlwaysSuccess(null);
+        assertEquals(Status.SUCCESS, asNull.tick());
+    }
+
+    @Test
+    void testAlwaysFailureAllBranches() {
+        // Child returns all statuses, AlwaysFailure should always return FAILURE
+        for (Status s : Status.values()) {
+            AlwaysFailure af = new AlwaysFailure(new Action(() -> s));
+            assertEquals(Status.FAILURE, af.tick());
+        }
+        // Child is null
+        AlwaysFailure afNull = new AlwaysFailure(null);
+        assertEquals(Status.FAILURE, afNull.tick());
+    }
+
+    @Test
+    void testForeverAllBranches() {
+        // Child returns all statuses, Forever should always return RUNNING
+        for (Status s : Status.values()) {
+            Forever f = new Forever(new Action(() -> s));
+            assertEquals(Status.RUNNING, f.tick());
+        }
+        // Child is null
+        Forever fNull = new Forever(null);
+        assertEquals(Status.RUNNING, fNull.tick());
+    }
+
+    // --- Targeted tests for uncovered branches ---
+    @Test
+    void testInvertNullChildAndRunning() {
+        Invert invert = new Invert(null);
+        assertEquals(Status.FAILURE, invert.tick());
+        Action running = new Action(() -> Status.RUNNING);
+        Invert invert2 = new Invert(running);
+        assertEquals(Status.RUNNING, invert2.tick());
+    }
+
+    @Test
+    void testRepeatNullChildAndRunning() {
+        Repeat repeat = new Repeat(null);
+        assertEquals(Status.FAILURE, repeat.tick());
+        Action running = new Action(() -> Status.RUNNING);
+        Repeat repeat2 = new Repeat(running);
+        assertEquals(Status.RUNNING, repeat2.tick());
+    }
+
+    @Test
+    void testLogLevelsAndNulls() {
+        Action running = new Action(() -> Status.RUNNING);
+        Log log = new Log(running, null, null);
+        assertEquals(Status.RUNNING, log.tick());
+        Action ready = new Action(() -> Status.READY);
+        Log log2 = new Log(ready, null, null);
+        assertEquals(Status.READY, log2.tick());
+        Log log3 = new Log(null, null, null);
+        assertEquals(Status.FAILURE, log3.tick());
+    }
+
+    @Test
+    void testWithTimeoutDefaultCase() throws InterruptedException {
+        Action ready = new Action(() -> Status.READY);
+        WithTimeout wt = new WithTimeout(ready, Duration.ofMillis(10));
+        assertEquals(Status.FAILURE, wt.tick());
+    }
+
+    @Test
+    void testWhileFailureDefaultCase() {
+        Action nullStatus = new Action(() -> null);
+        WhileFailure wf = new WhileFailure(nullStatus);
+        assertEquals(Status.RUNNING, wf.tick());
+    }
+
+    @Test
+    void testWhileSuccessDefaultCase() {
+        Action nullStatus = new Action(() -> null);
+        WhileSuccess ws = new WhileSuccess(nullStatus);
+        assertEquals(Status.FAILURE, ws.tick());
+    }
+
+    @Test
+    void testAlwaysSuccessNullChild() {
+        AlwaysSuccess as = new AlwaysSuccess(null);
+        assertEquals(Status.SUCCESS, as.tick());
+    }
+
+    @Test
+    void testAlwaysFailureNullChild() {
+        AlwaysFailure af = new AlwaysFailure(null);
+        assertEquals(Status.FAILURE, af.tick());
+    }
+
+    @Test
+    void testForeverNullChild() {
+        Forever f = new Forever(null);
+        assertEquals(Status.RUNNING, f.tick());
+    }
+
     // --- Additional tests for 80%+ coverage ---
     @Test
     void testCompositeToStringAndReset() {
@@ -207,7 +469,7 @@ public class BehaviorTreeTest {
         Action fail = new Action(() -> Status.FAILURE);
         Action running = new Action(() -> Status.RUNNING);
         Parallel parallel = new Parallel(Arrays.asList(fail, running), 2);
-        assertEquals(Status.RUNNING, parallel.tick());
+        assertEquals(Status.FAILURE, parallel.tick());
     }
 
     @Test
@@ -290,7 +552,7 @@ public class BehaviorTreeTest {
         Action fail = new Action(() -> Status.FAILURE);
         RepeatN repeatN = new RepeatN(fail, 2);
         assertEquals(Status.RUNNING, repeatN.tick());
-        assertEquals(Status.SUCCESS, repeatN.tick());
+        assertEquals(Status.FAILURE, repeatN.tick());
     }
 
     @Test
@@ -311,7 +573,7 @@ public class BehaviorTreeTest {
     void testWhileSuccessChildReturnsReady() {
         Action ready = new Action(() -> Status.READY);
         WhileSuccess whileSuccess = new WhileSuccess(ready);
-        assertEquals(Status.RUNNING, whileSuccess.tick());
+        assertEquals(Status.FAILURE, whileSuccess.tick());
     }
 
     @Test

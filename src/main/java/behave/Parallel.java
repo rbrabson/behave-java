@@ -70,6 +70,10 @@ public class Parallel implements Node {
         int successCount = 0, runningCount = 0;
         for (Node child : children) {
             Status s = child.tick();
+            if (s == null) {
+                // treat null as failure
+                continue;
+            }
             switch (s) {
             case SUCCESS:
                 successCount++;

@@ -68,6 +68,11 @@ public class Log implements Node {
             return status;
         }
         Status childStatus = child.tick();
+        if (childStatus == null) {
+            status = Status.FAILURE;
+            log(Level.WARNING, "Log node child returned null status", status);
+            return status;
+        }
         status = childStatus;
         String msg = (message != null) ? message : "Log node executed";
         Level level = (logLevel != null) ? logLevel : defaultLevel(childStatus);

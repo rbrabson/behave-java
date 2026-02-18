@@ -42,6 +42,11 @@ public class RepeatN implements Node {
         }
         if (maxCount <= 0 || count < maxCount) {
             Status childStatus = child.tick();
+            if (childStatus == null) {
+                status = Status.FAILURE;
+                count = maxCount;
+                return status;
+            }
             if (childStatus == Status.RUNNING) {
                 status = Status.RUNNING;
                 return status;

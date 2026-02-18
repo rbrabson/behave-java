@@ -49,6 +49,10 @@ public class Selector implements Node {
     public Status tick() {
         for (Node child : children) {
             Status s = child.tick();
+            if (s == null) {
+                status = Status.FAILURE;
+                return status;
+            }
             switch (s) {
             case FAILURE:
                 break;

@@ -36,6 +36,10 @@ public class WhileFailure implements Node {
             return status;
         }
         Status childStatus = child.tick();
+        if (childStatus == null) {
+            status = Status.RUNNING;
+            return status;
+        }
         switch (childStatus) {
         case RUNNING:
         case FAILURE:

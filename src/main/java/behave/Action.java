@@ -44,6 +44,10 @@ public class Action implements Node {
             return status;
         }
         Status s = run.run();
+        if (s == null) {
+            status = Status.FAILURE;
+            return status;
+        }
         switch (s) {
         case READY:
         case RUNNING:

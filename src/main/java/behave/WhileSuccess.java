@@ -36,6 +36,10 @@ public class WhileSuccess implements Node {
             return status;
         }
         Status childStatus = child.tick();
+        if (childStatus == null) {
+            status = Status.FAILURE;
+            return status;
+        }
         if (childStatus == Status.RUNNING || childStatus == Status.SUCCESS) {
             if (childStatus == Status.SUCCESS) {
                 child.reset();
