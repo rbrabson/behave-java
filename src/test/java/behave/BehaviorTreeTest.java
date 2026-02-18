@@ -1,6 +1,7 @@
 package behave;
 
 import org.junit.jupiter.api.Test;
+
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -8,24 +9,24 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class BehaviorTreeTest {
-    static class RunForNTicks {
-        int numTicksToRun = 0;
-        int timesTicked = 0;
+    static class Counter {
+        private int numTicks;
+        private int ticks = 0;
 
-        RunForNTicks(int numTicks) {
-            this.numTicksToRun = numTicks;
+        Counter(int numTicks) {
+            this.numTicks = numTicks;
         }
 
-        Status run() {
-            timesTicked++;
-            return timesTicked >= numTicksToRun ? Status.SUCCESS : Status.RUNNING;
+        Status tickUntilDone() {
+            ticks++;
+            return ticks >= numTicks ? Status.SUCCESS : Status.RUNNING;
         }
     }
 
     @Test
     void testUsingClassForAction() {
-        RunForNTicks runForNTicks = new RunForNTicks(5);
-        Action runTC = new Action(() -> runForNTicks.run());
+        Counter counter = new Counter(5);
+        Action runTC = new Action((counter::tickUntilDone));
         BehaviorTree tree = new BehaviorTree(runTC);
         while (tree.tick() == Status.RUNNING) {
             // Loop until the tree returns SUCCESS

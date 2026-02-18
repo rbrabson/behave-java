@@ -156,8 +156,8 @@ import behave.*;
 
 // A class whose method will be used as an action in the behavior tree
 class Counter {
- int numTicks;
- int ticks = 0;
+ private int numTicks;
+ private int ticks = 0;
 
  Counter(int numTicks) {
   this.numTicks = numTicks;
@@ -172,7 +172,7 @@ class Counter {
 public class Example {
  public static void main(String[] args) {
   Counter counter = new Counter(5);
-  Action action = new Action(() -> counter.tickUntilDone());
+  Action action = new Action(counter::tickUntilDone);
   BehaviorTree tree = new BehaviorTree(action);
   while (tree.tick() == Status.RUNNING) {
    // Loop until the tree returns SUCCESS
