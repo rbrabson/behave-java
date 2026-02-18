@@ -1,3 +1,61 @@
+## Best Practices for Using Behavior Trees
+
+Here are some tips and patterns for getting the most out of the behavior tree framework:
+
+### 1. Structure Trees for Clarity and Reuse
+
+- **Compose small, focused nodes:** Break complex logic into small Action or Condition nodes. This makes trees easier to read, debug, and reuse.
+- **Use composites and decorators:** Combine nodes with Sequence, Selector, Parallel, and decorators to express complex behaviors simply.
+
+### 2. Use Decorators for Robustness
+
+- **Retry and Repeat:** Use `Retry` for actions that may fail transiently (e.g., network calls), and `Repeat` for polling or periodic checks.
+- **WithTimeout:** Wrap long-running or potentially stuck nodes with `WithTimeout` to prevent blocking the tree.
+- **Invert, AlwaysSuccess, AlwaysFailure:** Use these to adapt node results for flexible control flow.
+
+### 3. Integrate with Application State
+
+- **Pass lambdas or method references:** Action and Condition nodes can use lambdas that access your application state, making trees highly dynamic.
+- **Update state in actions:** Use Action nodes to perform side effects (e.g., move a robot, send a message) and update your model.
+
+### 4. Debugging and Logging
+
+- **Use Log nodes:** Insert `Log` decorators to trace execution and status changes, especially around complex subtrees.
+- **Override toString():** All nodes implement `toString()` for easy tree visualization and debugging.
+
+### 5. Testing Behavior Trees
+
+- **Unit test nodes and trees:** Write tests for custom nodes and for entire trees using the JUnit test suite as a template.
+- **Mock dependencies:** Use lambdas or mocks for actions/conditions to simulate different scenarios.
+
+### 6. Extending the Framework
+
+- **Custom nodes:** Implement the `Node` interface to create new node types tailored to your domain.
+- **Custom decorators:** Wrap nodes with new logic (e.g., rate limiting, conditional execution) by composing or subclassing.
+
+### Example: Real-World Integration Pattern
+
+```java
+// Example: Integrating a behavior tree into a game loop
+BehaviorTree aiTree = ...; // Build your tree
+
+void gameLoop() {
+ while (gameIsRunning()) {
+  aiTree.tick();
+  // ... other game logic ...
+ }
+}
+
+// Example: Using application state in nodes
+Player player = ...;
+Action moveToTarget = new Action(() -> player.moveTo(targetPosition));
+Condition isAtTarget = new Condition(() -> player.isAt(targetPosition) ? Status.SUCCESS : Status.FAILURE);
+```
+
+---
+
+By following these patterns, you can build robust, maintainable, and extensible behavior trees for AI, robotics, workflow engines, and more.
+
 # Behavior Tree
 
 ## Usage Examples
