@@ -14,6 +14,48 @@ behave-java is a Java library for building and executing behavior trees. It prov
 - `behave.BehaviorTree` — The root node for executing a tree.
 - `behave.Status` — Enum for node execution status (SUCCESS, FAILURE, RUNNING).
 
+**Core Classes:**
+
+- `BehaviorTree`: The main class representing a behavior tree, managing the root node and tree status.
+- `Node`: Interface for all behavior tree nodes. All node types implement this.
+- `Status`: Enum for node states: READY, RUNNING, SUCCESS, FAILURE.
+
+**Node Types:**
+
+- `Action`: Leaf node that executes a user-provided action function.
+- `Condition`: Leaf node that evaluates a user-provided condition function.
+- `Composite`: Runs a list of condition nodes and a child node; child runs only if all conditions succeed.
+- `Selector`: Runs children in order, returning SUCCESS on the first child that succeeds.
+- `Sequence`: Runs children in order, returning FAILURE on the first child that fails.
+- `Parallel`: Runs all children in parallel; succeeds if a minimum number of children succeed.
+
+**Decorators:**
+
+- `Retry`: Repeats its child until it succeeds.
+- `Repeat`: Repeats its child until it fails.
+- `RepeatN`: Repeats its child a fixed number of times.
+- `Forever`: Runs its child forever (always RUNNING).
+- `Invert`: Inverts the result of its child (SUCCESS→FAILURE, FAILURE→SUCCESS).
+- `AlwaysSuccess`: Returns SUCCESS regardless of its child's result.
+- `AlwaysFailure`: Returns FAILURE regardless of its child's result.
+- `WhileSuccess`: Repeats its child while it returns SUCCESS or RUNNING.
+- `WhileFailure`: Repeats its child while it returns FAILURE or RUNNING.
+- `WithTimeout`: Runs its child, but fails if it takes longer than a specified duration.
+- `Log`: Logs the status of its child each tick.
+
+See the source files in `src/main/java/behave/` for implementation details.
+
+## Behvior Tree
+
+A Java implementation of a flexible behavior tree framework, inspired by the Go [behave](../behave) library.
+
+## Features
+
+- BehaviorTree, Node, and Status abstractions
+- Action, Condition, Composite, Selector, Sequence, Parallel nodes
+- Decorators: Retry, Repeat, Invert, AlwaysSuccess, AlwaysFailure, RepeatN, Forever, WhileSuccess, WhileFailure, WithTimeout, Log
+- Easy to extend and integrate
+
 ## Usage
 
 ### Example: Building a Behavior Tree
@@ -212,50 +254,6 @@ boolean hasAmmo() { /* ... */ return false; }
 Status reloadWeapon() { /* ... */ return Status.SUCCESS; }
 Status shootWeapon() { /* ... */ return Status.SUCCESS; }
 ```
-
-// See the test suite for more advanced and edge-case scenarios.
-
-**Core Classes:**
-
-- `BehaviorTree`: The main class representing a behavior tree, managing the root node and tree status.
-- `Node`: Interface for all behavior tree nodes. All node types implement this.
-- `Status`: Enum for node states: READY, RUNNING, SUCCESS, FAILURE.
-
-**Node Types:**
-
-- `Action`: Leaf node that executes a user-provided action function.
-- `Condition`: Leaf node that evaluates a user-provided condition function.
-- `Composite`: Runs a list of condition nodes and a child node; child runs only if all conditions succeed.
-- `Selector`: Runs children in order, returning SUCCESS on the first child that succeeds.
-- `Sequence`: Runs children in order, returning FAILURE on the first child that fails.
-- `Parallel`: Runs all children in parallel; succeeds if a minimum number of children succeed.
-
-**Decorators:**
-
-- `Retry`: Repeats its child until it succeeds.
-- `Repeat`: Repeats its child until it fails.
-- `RepeatN`: Repeats its child a fixed number of times.
-- `Forever`: Runs its child forever (always RUNNING).
-- `Invert`: Inverts the result of its child (SUCCESS→FAILURE, FAILURE→SUCCESS).
-- `AlwaysSuccess`: Returns SUCCESS regardless of its child's result.
-- `AlwaysFailure`: Returns FAILURE regardless of its child's result.
-- `WhileSuccess`: Repeats its child while it returns SUCCESS or RUNNING.
-- `WhileFailure`: Repeats its child while it returns FAILURE or RUNNING.
-- `WithTimeout`: Runs its child, but fails if it takes longer than a specified duration.
-- `Log`: Logs the status of its child each tick.
-
-See the source files in `src/main/java/behave/` for implementation details.
-
-## Behvior Tree
-
-A Java implementation of a flexible behavior tree framework, inspired by the Go [behave](../behave) library.
-
-## Features
-
-- BehaviorTree, Node, and Status abstractions
-- Action, Condition, Composite, Selector, Sequence, Parallel nodes
-- Decorators: Retry, Repeat, Invert, AlwaysSuccess, AlwaysFailure, RepeatN, Forever, WhileSuccess, WhileFailure, WithTimeout, Log
-- Easy to extend and integrate
 
 ## License
 
