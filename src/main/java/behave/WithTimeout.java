@@ -11,6 +11,7 @@ public class WithTimeout implements Node {
     private Instant startTime;
     private Status status = Status.READY;
 
+    // Constructor takes a child node to decorate and a duration for the timeout.
     public WithTimeout(Node child, Duration duration) {
         this.child = child;
         this.duration = duration;
