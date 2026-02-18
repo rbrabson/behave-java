@@ -1,14 +1,18 @@
 package behave;
 
+// BehaviorTree class that manages the execution of a behavior tree with a given root node.
 public class BehaviorTree {
     private Node root;
     private Status status;
 
+    // Constructor takes a root node for the behavior tree and initializes the
+    // status to READY.
     public BehaviorTree(Node root) {
         this.root = root;
         this.status = Status.READY;
     }
 
+    // Ticks the root node of the behavior tree and updates the status accordingly.
     public Status tick() {
         if (root == null) {
             status = Status.FAILURE;
@@ -18,6 +22,8 @@ public class BehaviorTree {
         return status;
     }
 
+    // Resets the behavior tree by resetting the root node and setting the status
+    // back to READY.
     public BehaviorTree reset() {
         if (root != null) {
             root.reset();
@@ -30,6 +36,7 @@ public class BehaviorTree {
         return status;
     }
 
+    // Provides a string representation of the behavior tree, including its current
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
@@ -42,4 +49,4 @@ public class BehaviorTree {
         }
         return builder.toString();
     }
-}// ...existing code from src/behave/BehaviorTree.java...
+}

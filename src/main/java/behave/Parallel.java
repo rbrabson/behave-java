@@ -2,16 +2,22 @@ package behave;
 
 import java.util.List;
 
+// Parallel node that ticks all its children and returns SUCCESS if at least a specified number of them succeed, 
+// FAILURE if it's impossible for enough to succeed, and RUNNING otherwise.
 public class Parallel implements Node {
     private final List<Node> children;
     private int minSuccessCount;
     private Status status = Status.READY;
 
+    // Constructor takes a list of child nodes and the minimum number of successes
+    // required for this node to succeed.
     public Parallel(List<Node> children, int minSuccessCount) {
         this.children = children;
         this.minSuccessCount = minSuccessCount;
     }
 
+    // Overloaded constructor for when the minimum success count is not provided,
+    // defaulting to 1.
     @Override
     public Status reset() {
         for (Node child : children) {
@@ -21,6 +27,8 @@ public class Parallel implements Node {
         return status;
     }
 
+    // Ticks all child nodes and updates the status of this node based on the
+    // results, following the logic described above.
     @Override
     public Status tick() {
         if (children.isEmpty()) {
@@ -63,11 +71,14 @@ public class Parallel implements Node {
         return status;
     }
 
+    // Returns the current status of this node.
     @Override
     public Status status() {
         return status;
     }
 
+    // Provides a string representation of the node, including its current status
+    // and the string representations of its children.
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
@@ -80,4 +91,4 @@ public class Parallel implements Node {
         }
         return builder.toString();
     }
-}// ...existing code from src/behave/Parallel.java...
+}

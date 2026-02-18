@@ -1,8 +1,11 @@
 package behave;
 
+// Enum representing the possible statuses of a behavior tree node.
 public enum Status {
     READY, RUNNING, SUCCESS, FAILURE;
 
+    // Provides a string representation of the status for easier debugging and
+    // visualization.
     @Override
     public String toString() {
         switch (this) {
@@ -18,4 +21,4 @@ public enum Status {
             return "Unknown";
         }
     }
-}// ...existing code from src/behave/Status.java...
+}

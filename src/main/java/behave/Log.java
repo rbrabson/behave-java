@@ -3,6 +3,7 @@ package behave;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+// Log node that logs the status of its child node when ticked.
 public class Log implements Node {
     private static final Logger logger = Logger.getLogger(Log.class.getName());
     private final Node child;
@@ -10,20 +11,27 @@ public class Log implements Node {
     private final Level logLevel;
     private Status status = Status.READY;
 
+    // Constructor takes a child node to decorate, an optional message to log, and
+    // an optional log level.
     public Log(Node child, String message, Level logLevel) {
         this.child = child;
         this.message = message;
         this.logLevel = logLevel;
     }
 
+    // Overloaded constructors for convenience when message or log level are not
+    // provided.
     public Log(Node child, String message) {
         this(child, message, null);
     }
 
+    // Overloaded constructor for when only the child node is provided.
     public Log(Node child) {
         this(child, null, null);
     }
 
+    // Ticks the child node and logs its status, updating the status of this node
+    // accordingly.
     @Override
     public Status tick() {
         if (child == null) {
@@ -39,10 +47,13 @@ public class Log implements Node {
         return status;
     }
 
+    // Helper method to log messages with the appropriate level and child status
+    // information.
     private void log(Level level, String msg, Status childStatus) {
         logger.log(level, msg + " | child_status=" + childStatus + ", child_type=" + getChildType());
     }
 
+    // Determines the default log level based on the child's status.
     private Level defaultLevel(Status s) {
         switch (s) {
         case SUCCESS:
@@ -57,10 +68,12 @@ public class Log implements Node {
         }
     }
 
+    //
     private String getChildType() {
         return (child != null) ? child.getClass().getSimpleName() : "null";
     }
 
+    // Resets the status to READY and resets the child node if it exists.
     @Override
     public Status reset() {
         status = Status.READY;
@@ -69,11 +82,13 @@ public class Log implements Node {
         return status;
     }
 
+    // Returns the current status of this node.
     @Override
     public Status status() {
         return status;
     }
 
+    // Provides a string representation of the node, including its current status
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
@@ -87,4 +102,4 @@ public class Log implements Node {
         }
         return builder.toString();
     }
-}// ...existing code from src/behave/Log.java...
+}

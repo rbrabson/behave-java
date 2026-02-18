@@ -1,13 +1,16 @@
 package behave;
 
+// Decorator node that always returns FAILURE, regardless of the child's status.
 public class AlwaysFailure implements Node {
     private final Node child;
     private Status status = Status.READY;
 
+    // Constructor takes a child node to decorate.
     public AlwaysFailure(Node child) {
         this.child = child;
     }
 
+    // Ticks the child node and always returns FAILURE.
     @Override
     public Status tick() {
         if (child != null) {
@@ -17,6 +20,7 @@ public class AlwaysFailure implements Node {
         return status;
     }
 
+    // Resets the status to READY and resets the child node if it exists.
     @Override
     public Status reset() {
         status = Status.READY;
@@ -25,11 +29,14 @@ public class AlwaysFailure implements Node {
         return status;
     }
 
+    // Returns the current status of this node.
     @Override
     public Status status() {
         return status;
     }
 
+    // Provides a string representation of the node, including its current status
+    // and the child's representation.
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
@@ -43,4 +50,4 @@ public class AlwaysFailure implements Node {
         }
         return builder.toString();
     }
-}// ...existing code from src/behave/AlwaysFailure.java...
+}

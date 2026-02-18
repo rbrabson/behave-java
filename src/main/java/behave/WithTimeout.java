@@ -3,6 +3,8 @@ package behave;
 import java.time.Duration;
 import java.time.Instant;
 
+// WithTimeout node that ticks its child node and fails if it doesn't succeed within the specified duration, 
+// keeps it RUNNING if it's still running.
 public class WithTimeout implements Node {
     private final Node child;
     private final Duration duration;
@@ -14,6 +16,8 @@ public class WithTimeout implements Node {
         this.duration = duration;
     }
 
+    // Ticks the child node and updates the status of this node based on the child's
+    // status and the timeout.
     @Override
     public Status tick() {
         if (child == null) {
@@ -42,6 +46,7 @@ public class WithTimeout implements Node {
         }
     }
 
+    // Resets this node and its child node to READY, and resets the start time.
     @Override
     public Status reset() {
         status = Status.READY;
@@ -51,11 +56,13 @@ public class WithTimeout implements Node {
         return status;
     }
 
+    // Returns the current status of this node.
     @Override
     public Status status() {
         return status;
     }
 
+    // Provides a string representation of this node, including its current status
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
@@ -69,4 +76,4 @@ public class WithTimeout implements Node {
         }
         return builder.toString();
     }
-}// ...existing code from src/behave/WithTimeout.java...
+}

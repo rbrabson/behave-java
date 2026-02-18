@@ -2,14 +2,17 @@ package behave;
 
 import java.util.List;
 
+// Selector node that ticks its child nodes in order until one succeeds, returning the first success or the last failure.
 public class Selector implements Node {
     private final List<Node> children;
     private Status status = Status.READY;
 
+    // Constructor takes a list of child nodes to evaluate in order.
     public Selector(List<Node> children) {
         this.children = children;
     }
 
+    // Resets all child nodes and sets this node's status to READY.
     @Override
     public Status reset() {
         for (Node child : children) {
@@ -19,6 +22,8 @@ public class Selector implements Node {
         return status;
     }
 
+    // Ticks each child node in order until one succeeds, returning the first
+    // success or the last failure.
     @Override
     public Status tick() {
         for (Node child : children) {
@@ -40,11 +45,13 @@ public class Selector implements Node {
         return status;
     }
 
+    // Returns the current status of this node.
     @Override
     public Status status() {
         return status;
     }
 
+    // Provides a string representation of this node, including its current status,
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
@@ -57,4 +64,4 @@ public class Selector implements Node {
         }
         return builder.toString();
     }
-}// ...existing code from src/behave/Selector.java...
+}

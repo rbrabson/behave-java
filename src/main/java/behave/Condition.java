@@ -1,17 +1,22 @@
 package behave;
 
+// Condition node that evaluates a condition function and returns its status.
 public class Condition implements Node {
     private final ConditionFunction check;
     private Status status = Status.READY;
 
+    // Functional interface for the condition function that returns a Status.
     public interface ConditionFunction {
         Status check();
     }
 
+    // Constructor takes a condition function to evaluate.
     public Condition(ConditionFunction check) {
         this.check = check;
     }
 
+    // Ticks the condition by evaluating the condition function and updating the
+    // status based on its result.
     @Override
     public Status tick() {
         if (check == null) {
@@ -32,19 +37,22 @@ public class Condition implements Node {
         }
     }
 
+    // Resets the status to READY.
     @Override
     public Status reset() {
         status = Status.READY;
         return status;
     }
 
+    // Returns the current status of this node.
     @Override
     public Status status() {
         return status;
     }
 
+    // Provides a string representation of the node, including its current status
     @Override
     public String toString() {
         return "Condition (" + status + ")";
     }
-}// ...existing code from src/behave/Condition.java...
+}

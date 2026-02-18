@@ -1,16 +1,21 @@
 package behave;
 
+// RepeatN node that ticks its child node up to a specified number of times, returning the child's status on the final tick.
 public class RepeatN implements Node {
     private final Node child;
     private final int maxCount;
     private int count = 0;
     private Status status = Status.READY;
 
+    // Constructor takes a child node to decorate and the maximum number of times to
+    // tick it.
     public RepeatN(Node child, int maxCount) {
         this.child = child;
         this.maxCount = maxCount;
     }
 
+    // Ticks the child node and updates the status of this node based on the child's
+    // status and the count, following the logic described above.
     @Override
     public Status tick() {
         if (child == null) {
@@ -36,6 +41,7 @@ public class RepeatN implements Node {
         return status;
     }
 
+    // Resets the count and status of this node, and resets the child node as well.
     @Override
     public Status reset() {
         status = Status.READY;
@@ -45,11 +51,15 @@ public class RepeatN implements Node {
         return status;
     }
 
+    // Returns the current status of this node.
     @Override
     public Status status() {
         return status;
     }
 
+    // Provides a string representation of this node, including its current status,
+    // count, and max count,
+    // as well as the string representation of its child.
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
@@ -63,4 +73,4 @@ public class RepeatN implements Node {
         }
         return builder.toString();
     }
-}// ...existing code from src/behave/RepeatN.java...
+}

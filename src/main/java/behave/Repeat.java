@@ -1,13 +1,17 @@
 package behave;
 
+// Repeat node that ticks its child node and resets it to RUNNING if it succeeds, keeps it RUNNING if it's still
+// running, and fails if it fails.
 public class Repeat implements Node {
     private final Node child;
     private Status status = Status.READY;
 
+    // Constructor takes a child node to decorate.
     public Repeat(Node child) {
         this.child = child;
     }
 
+    //
     @Override
     public Status tick() {
         if (child == null) {
@@ -32,6 +36,7 @@ public class Repeat implements Node {
         }
     }
 
+    //
     @Override
     public Status reset() {
         status = Status.READY;
@@ -40,11 +45,13 @@ public class Repeat implements Node {
         return status;
     }
 
+    //
     @Override
     public Status status() {
         return status;
     }
 
+    //
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
@@ -57,4 +64,4 @@ public class Repeat implements Node {
         }
         return builder.toString();
     }
-}// ...existing code from src/behave/Repeat.java...
+}
