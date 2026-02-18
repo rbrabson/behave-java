@@ -43,4 +43,4 @@ public class AlwaysSuccess implements Node {
         }
         return builder.toString();
     }
-}
+}// ...existing code from src/behave/AlwaysSuccess.java...

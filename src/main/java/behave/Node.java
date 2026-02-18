@@ -8,4 +8,4 @@ public interface Node {
     Status status();
 
     String toString();
-}
+}// ...existing code from src/behave/Node.java...

@@ -1,10 +1,10 @@
 package behave;
 
-public class Invert implements Node {
+public class Retry implements Node {
     private final Node child;
     private Status status = Status.READY;
 
-    public Invert(Node child) {
+    public Retry(Node child) {
         this.child = child;
     }
 
@@ -17,19 +17,17 @@ public class Invert implements Node {
         Status childStatus = child.tick();
         switch (childStatus) {
         case SUCCESS:
-            status = Status.FAILURE;
-            return status;
-        case FAILURE:
             status = Status.SUCCESS;
             return status;
         case RUNNING:
             status = Status.RUNNING;
             return status;
-        case READY:
-            status = Status.READY;
+        case FAILURE:
+            child.reset();
+            status = Status.RUNNING;
             return status;
         default:
-            status = Status.FAILURE;
+            status = Status.RUNNING;
             return status;
         }
     }
@@ -50,14 +48,13 @@ public class Invert implements Node {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("Invert (" + status + ")");
+        builder.append("Retry (" + status + ")");
         if (child != null) {
             String[] lines = child.toString().split("\n");
-            builder.append("\n  " + lines[0]);
-            for (int i = 1; i < lines.length; i++) {
-                builder.append("\n  " + lines[i]);
+            for (String line : lines) {
+                builder.append("\n  ").append(line);
             }
         }
         return builder.toString();
     }
-}
+}// ...existing code from src/behave/Retry.java...

@@ -1,20 +1,35 @@
 package behave;
 
-public class AlwaysFailure implements Node {
+public class WhileFailure implements Node {
     private final Node child;
     private Status status = Status.READY;
 
-    public AlwaysFailure(Node child) {
+    public WhileFailure(Node child) {
         this.child = child;
     }
 
     @Override
     public Status tick() {
-        if (child != null) {
-            child.tick();
+        if (child == null) {
+            status = Status.SUCCESS;
+            return status;
         }
-        status = Status.FAILURE;
-        return status;
+        Status childStatus = child.tick();
+        switch (childStatus) {
+        case RUNNING:
+        case FAILURE:
+            status = Status.RUNNING;
+            if (childStatus == Status.FAILURE) {
+                child.reset();
+            }
+            return status;
+        case SUCCESS:
+            status = Status.SUCCESS;
+            return status;
+        default:
+            status = Status.RUNNING;
+            return status;
+        }
     }
 
     @Override
@@ -33,7 +48,7 @@ public class AlwaysFailure implements Node {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("AlwaysFailure (" + status + ")");
+        builder.append("WhileFailure (" + status + ")");
         if (child != null) {
             String[] lines = child.toString().split("\n");
             builder.append("\n  " + lines[0]);
@@ -43,4 +58,4 @@ public class AlwaysFailure implements Node {
         }
         return builder.toString();
     }
-}
+}// ...existing code from src/behave/WhileFailure.java...

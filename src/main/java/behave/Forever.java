@@ -1,35 +1,20 @@
 package behave;
 
-public class WhileFailure implements Node {
+public class Forever implements Node {
     private final Node child;
     private Status status = Status.READY;
 
-    public WhileFailure(Node child) {
+    public Forever(Node child) {
         this.child = child;
     }
 
     @Override
     public Status tick() {
-        if (child == null) {
-            status = Status.SUCCESS;
-            return status;
+        if (child != null) {
+            child.tick();
         }
-        Status childStatus = child.tick();
-        switch (childStatus) {
-        case RUNNING:
-        case FAILURE:
-            status = Status.RUNNING;
-            if (childStatus == Status.FAILURE) {
-                child.reset();
-            }
-            return status;
-        case SUCCESS:
-            status = Status.SUCCESS;
-            return status;
-        default:
-            status = Status.RUNNING;
-            return status;
-        }
+        status = Status.RUNNING;
+        return status;
     }
 
     @Override
@@ -48,7 +33,7 @@ public class WhileFailure implements Node {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("WhileFailure (" + status + ")");
+        builder.append("Forever (" + status + ")");
         if (child != null) {
             String[] lines = child.toString().split("\n");
             builder.append("\n  " + lines[0]);
@@ -58,4 +43,4 @@ public class WhileFailure implements Node {
         }
         return builder.toString();
     }
-}
+}// ...existing code from src/behave/Forever.java...

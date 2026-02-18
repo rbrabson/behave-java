@@ -73,17 +73,19 @@ public class Composite implements Node {
         StringBuilder builder = new StringBuilder();
         builder.append("Composite (" + status + ")");
         if (conditions != null) {
-            for (int i = 0; i < conditions.size(); i++) {
-                builder.append("\n  Condition[" + i + "]: " + conditions.get(i));
+            for (Node cond : conditions) {
+                String[] lines = cond.toString().split("\n");
+                for (String line : lines) {
+                    builder.append("\n  ").append(line);
+                }
             }
         }
         if (child != null) {
             String[] lines = child.toString().split("\n");
-            builder.append("\n  Child: " + lines[0]);
-            for (int i = 1; i < lines.length; i++) {
-                builder.append("\n  " + lines[i]);
+            for (String line : lines) {
+                builder.append("\n  ").append(line);
             }
         }
         return builder.toString();
     }
-}
+}// ...existing code from src/behave/Composite.java...

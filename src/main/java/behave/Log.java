@@ -58,7 +58,7 @@ public class Log implements Node {
     }
 
     private String getChildType() {
-        return (child == null) ? "null" : child.getClass().getSimpleName();
+        return (child != null) ? child.getClass().getSimpleName() : "null";
     }
 
     @Override
@@ -66,7 +66,6 @@ public class Log implements Node {
         status = Status.READY;
         if (child != null)
             child.reset();
-        logger.fine("Log node reset: " + message);
         return status;
     }
 
@@ -78,18 +77,14 @@ public class Log implements Node {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("Log (" + status);
-        if (message != null)
-            builder.append(", \"").append(message).append("\"");
-        if (logLevel != null)
-            builder.append(", Level:").append(logLevel);
-        builder.append(")");
+        builder.append("Log (" + status + ")");
         if (child != null) {
             String[] lines = child.toString().split("\n");
-            for (String line : lines) {
-                builder.append("\n  ").append(line);
+            builder.append("\n  " + lines[0]);
+            for (int i = 1; i < lines.length; i++) {
+                builder.append("\n  " + lines[i]);
             }
         }
         return builder.toString();
     }
-}
+}// ...existing code from src/behave/Log.java...

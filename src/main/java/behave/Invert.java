@@ -1,45 +1,42 @@
 package behave;
 
-public class RepeatN implements Node {
+public class Invert implements Node {
     private final Node child;
-    private final int maxCount;
-    private int count = 0;
     private Status status = Status.READY;
 
-    public RepeatN(Node child, int maxCount) {
+    public Invert(Node child) {
         this.child = child;
-        this.maxCount = maxCount;
     }
 
     @Override
     public Status tick() {
         if (child == null) {
             status = Status.FAILURE;
-            count = maxCount;
             return status;
         }
-        if (maxCount <= 0 || count < maxCount) {
-            Status childStatus = child.tick();
-            if (childStatus == Status.RUNNING) {
-                status = Status.RUNNING;
-                return status;
-            }
-            count++;
-            if (maxCount > 0 && count >= maxCount) {
-                status = childStatus;
-                return status;
-            }
-            child.reset();
+        Status childStatus = child.tick();
+        switch (childStatus) {
+        case SUCCESS:
+            status = Status.FAILURE;
+            return status;
+        case FAILURE:
+            status = Status.SUCCESS;
+            return status;
+        case RUNNING:
             status = Status.RUNNING;
             return status;
+        case READY:
+            status = Status.READY;
+            return status;
+        default:
+            status = Status.FAILURE;
+            return status;
         }
-        return status;
     }
 
     @Override
     public Status reset() {
         status = Status.READY;
-        count = 0;
         if (child != null)
             child.reset();
         return status;
@@ -53,7 +50,7 @@ public class RepeatN implements Node {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("RepeatN (" + status + ", " + count + "/" + maxCount + ")");
+        builder.append("Invert (" + status + ")");
         if (child != null) {
             String[] lines = child.toString().split("\n");
             builder.append("\n  " + lines[0]);
@@ -63,4 +60,4 @@ public class RepeatN implements Node {
         }
         return builder.toString();
     }
-}
+}// ...existing code from src/behave/Invert.java...

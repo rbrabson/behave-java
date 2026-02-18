@@ -71,7 +71,7 @@ public class Parallel implements Node {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("Parallel (" + status + ", MinSuccess: " + minSuccessCount + ")");
+        builder.append("Parallel (" + status + ")");
         for (Node child : children) {
             String[] lines = child.toString().split("\n");
             for (String line : lines) {
@@ -80,4 +80,4 @@ public class Parallel implements Node {
         }
         return builder.toString();
     }
-}
+}// ...existing code from src/behave/Parallel.java...

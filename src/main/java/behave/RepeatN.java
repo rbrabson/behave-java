@@ -1,51 +1,45 @@
 package behave;
 
-import java.time.Duration;
-import java.time.Instant;
-
-public class WithTimeout implements Node {
+public class RepeatN implements Node {
     private final Node child;
-    private final Duration duration;
-    private Instant startTime;
+    private final int maxCount;
+    private int count = 0;
     private Status status = Status.READY;
 
-    public WithTimeout(Node child, Duration duration) {
+    public RepeatN(Node child, int maxCount) {
         this.child = child;
-        this.duration = duration;
+        this.maxCount = maxCount;
     }
 
     @Override
     public Status tick() {
         if (child == null) {
             status = Status.FAILURE;
+            count = maxCount;
             return status;
         }
-        if (startTime == null) {
-            startTime = Instant.now();
-        }
-        Status childStatus = child.tick();
-        switch (childStatus) {
-        case SUCCESS:
-        case FAILURE:
-            status = childStatus;
-            return status;
-        case RUNNING:
-            if (Duration.between(startTime, Instant.now()).compareTo(duration) >= 0) {
-                status = Status.FAILURE;
+        if (maxCount <= 0 || count < maxCount) {
+            Status childStatus = child.tick();
+            if (childStatus == Status.RUNNING) {
+                status = Status.RUNNING;
                 return status;
             }
+            count++;
+            if (maxCount > 0 && count >= maxCount) {
+                status = childStatus;
+                return status;
+            }
+            child.reset();
             status = Status.RUNNING;
             return status;
-        default:
-            status = Status.FAILURE;
-            return status;
         }
+        return status;
     }
 
     @Override
     public Status reset() {
         status = Status.READY;
-        startTime = null;
+        count = 0;
         if (child != null)
             child.reset();
         return status;
@@ -59,7 +53,7 @@ public class WithTimeout implements Node {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("WithTimeout (" + status + ", Duration: " + duration + ")");
+        builder.append("RepeatN (" + status + ", " + count + "/" + maxCount + ")");
         if (child != null) {
             String[] lines = child.toString().split("\n");
             builder.append("\n  " + lines[0]);
@@ -69,4 +63,4 @@ public class WithTimeout implements Node {
         }
         return builder.toString();
     }
-}
+}// ...existing code from src/behave/RepeatN.java...

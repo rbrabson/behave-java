@@ -1,24 +1,24 @@
 package behave;
 
-public class Action implements Node {
-    private final ActionFunction run;
+public class Condition implements Node {
+    private final ConditionFunction check;
     private Status status = Status.READY;
 
-    public interface ActionFunction {
-        Status run();
+    public interface ConditionFunction {
+        Status check();
     }
 
-    public Action(ActionFunction run) {
-        this.run = run;
+    public Condition(ConditionFunction check) {
+        this.check = check;
     }
 
     @Override
     public Status tick() {
-        if (run == null) {
+        if (check == null) {
             status = Status.FAILURE;
             return status;
         }
-        Status s = run.run();
+        Status s = check.check();
         switch (s) {
         case READY:
         case RUNNING:
@@ -45,6 +45,6 @@ public class Action implements Node {
 
     @Override
     public String toString() {
-        return "Action (" + status + ")";
+        return "Condition (" + status + ")";
     }
-}
+}// ...existing code from src/behave/Condition.java...

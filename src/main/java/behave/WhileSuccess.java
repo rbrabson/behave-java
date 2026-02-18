@@ -1,19 +1,28 @@
 package behave;
 
-public class Forever implements Node {
+public class WhileSuccess implements Node {
     private final Node child;
     private Status status = Status.READY;
 
-    public Forever(Node child) {
+    public WhileSuccess(Node child) {
         this.child = child;
     }
 
     @Override
     public Status tick() {
-        if (child != null) {
-            child.tick();
+        if (child == null) {
+            status = Status.FAILURE;
+            return status;
         }
-        status = Status.RUNNING;
+        Status childStatus = child.tick();
+        if (childStatus == Status.RUNNING || childStatus == Status.SUCCESS) {
+            if (childStatus == Status.SUCCESS) {
+                child.reset();
+            }
+            status = Status.RUNNING;
+            return status;
+        }
+        status = Status.FAILURE;
         return status;
     }
 
@@ -33,7 +42,7 @@ public class Forever implements Node {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("Forever (" + status + ")");
+        builder.append("WhileSuccess (" + status + ")");
         if (child != null) {
             String[] lines = child.toString().split("\n");
             builder.append("\n  " + lines[0]);
@@ -43,4 +52,4 @@ public class Forever implements Node {
         }
         return builder.toString();
     }
-}
+}// ...existing code from src/behave/WhileSuccess.java...

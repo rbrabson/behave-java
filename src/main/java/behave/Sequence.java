@@ -57,4 +57,4 @@ public class Sequence implements Node {
         }
         return builder.toString();
     }
-}
+}// ...existing code from src/behave/Sequence.java...
