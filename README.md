@@ -17,140 +17,114 @@ tree.tick(); // returns Status.SUCCESS
 ### Action
 
 ```java
-Action action = new Action(() -> Status.SUCCESS);
-action.tick(); // returns Status.SUCCESS
-```
+## Usage Examples
 
-### Condition
+Below are real-world inspired examples demonstrating how to use the behave package to model practical behavior trees.
 
-```java
-Condition condition = new Condition(() -> Status.FAILURE);
-condition.tick(); // returns Status.FAILURE
-```
-
-### Composite
+### Example 1: Simple AI Agent (Patrol or Attack)
 
 ```java
-Condition c1 = new Condition(() -> Status.SUCCESS);
-Condition c2 = new Condition(() -> Status.SUCCESS);
+import behave.*;
+import java.util.*;
+
+// Condition: Is enemy visible?
+Condition enemyVisible = new Condition(() -> isEnemyVisible() ? Status.SUCCESS : Status.FAILURE);
+
+// Action: Attack enemy
+Action attack = new Action(() -> attackEnemy());
+
+// Action: Patrol area
+Action patrol = new Action(() -> patrolArea());
+
+// Selector: If enemy is visible, attack; otherwise, patrol
+Selector root = new Selector(Arrays.asList(
+ new Sequence(Arrays.asList(enemyVisible, attack)),
+ patrol
+));
+
+BehaviorTree tree = new BehaviorTree(root);
+tree.tick();
+
+// Helper methods (pseudo-implementations)
+boolean isEnemyVisible() { /* ... */ return false; }
+Status attackEnemy() { /* ... */ return Status.SUCCESS; }
+Status patrolArea() { /* ... */ return Status.SUCCESS; }
+```
+
+### Example 2: Retry and Timeout for Robust Actions
+
+```java
+import behave.*;
+import java.time.Duration;
+import java.util.concurrent.atomic.AtomicInteger;
+
+AtomicInteger attempts = new AtomicInteger(0);
+Action unreliableAction = new Action(() -> attempts.incrementAndGet() < 3 ? Status.FAILURE : Status.SUCCESS);
+
+// Retry the action up to 3 times, but fail if it takes too long
+Retry retry = new Retry(unreliableAction);
+WithTimeout timeout = new WithTimeout(retry, Duration.ofSeconds(2));
+
+BehaviorTree tree = new BehaviorTree(timeout);
+tree.tick();
+```
+
+### Example 3: Parallel Node for Multi-Tasking
+
+```java
+import behave.*;
+import java.util.*;
+
+Action scan = new Action(() -> scanForThreats());
+Action move = new Action(() -> moveToWaypoint());
+
+// Both actions must succeed for the parallel node to succeed
+Parallel parallel = new Parallel(Arrays.asList(scan, move), 2);
+
+BehaviorTree tree = new BehaviorTree(parallel);
+tree.tick();
+
+Status scanForThreats() { /* ... */ return Status.SUCCESS; }
+Status moveToWaypoint() { /* ... */ return Status.SUCCESS; }
+```
+
+### Example 4: Logging and Decorators
+
+```java
+import behave.*;
+import java.util.logging.Level;
+
 Action a = new Action(() -> Status.SUCCESS);
-Composite composite = new Composite(Arrays.asList(c1, c2), a);
-composite.tick(); // returns Status.SUCCESS
+Log log = new Log(a, "Action executed", Level.INFO);
+AlwaysSuccess alwaysSuccess = new AlwaysSuccess(log);
+
+BehaviorTree tree = new BehaviorTree(alwaysSuccess);
+tree.tick();
 ```
 
-### Selector
+### Example 5: Custom Composite with Conditions
 
 ```java
-Action fail = new Action(() -> Status.FAILURE);
-Action succeed = new Action(() -> Status.SUCCESS);
-Selector selector = new Selector(Arrays.asList(fail, succeed));
-selector.tick(); // returns Status.SUCCESS
+import behave.*;
+import java.util.*;
+
+Condition hasAmmo = new Condition(() -> hasAmmo() ? Status.SUCCESS : Status.FAILURE);
+Action reload = new Action(() -> reloadWeapon());
+Action shoot = new Action(() -> shootWeapon());
+
+// Only shoot if has ammo, otherwise reload
+Composite shootIfAmmo = new Composite(Arrays.asList(hasAmmo), shoot);
+Selector root = new Selector(Arrays.asList(shootIfAmmo, reload));
+
+BehaviorTree tree = new BehaviorTree(root);
+tree.tick();
+
+boolean hasAmmo() { /* ... */ return false; }
+Status reloadWeapon() { /* ... */ return Status.SUCCESS; }
+Status shootWeapon() { /* ... */ return Status.SUCCESS; }
 ```
 
-### Sequence
-
-```java
-Action a1 = new Action(() -> Status.SUCCESS);
-Action a2 = new Action(() -> Status.SUCCESS);
-Sequence sequence = new Sequence(Arrays.asList(a1, a2));
-sequence.tick(); // returns Status.SUCCESS
-```
-
-### Parallel
-
-```java
-Action a1 = new Action(() -> Status.SUCCESS);
-Action a2 = new Action(() -> Status.FAILURE);
-Parallel parallel = new Parallel(Arrays.asList(a1, a2), 1);
-parallel.tick(); // returns Status.SUCCESS
-```
-
-### Retry
-
-```java
-AtomicInteger count = new AtomicInteger(0);
-Action a = new Action(() -> count.incrementAndGet() < 3 ? Status.FAILURE : Status.SUCCESS);
-Retry retry = new Retry(a);
-retry.tick(); // returns Status.RUNNING until success
-```
-
-### Repeat
-
-```java
-AtomicInteger count = new AtomicInteger(0);
-Action a = new Action(() -> count.incrementAndGet() < 3 ? Status.SUCCESS : Status.FAILURE);
-Repeat repeat = new Repeat(a);
-repeat.tick(); // returns Status.RUNNING until failure
-```
-
-### RepeatN
-
-```java
-AtomicInteger count = new AtomicInteger(0);
-Action a = new Action(() -> { count.incrementAndGet(); return Status.SUCCESS; });
-RepeatN repeatN = new RepeatN(a, 3);
-repeatN.tick(); // returns Status.RUNNING, then Status.SUCCESS after 3 times
-```
-
-### Forever
-
-```java
-Action a = new Action(() -> Status.SUCCESS);
-Forever forever = new Forever(a);
-forever.tick(); // always returns Status.RUNNING
-```
-
-### Invert
-
-```java
-Action a = new Action(() -> Status.SUCCESS);
-Invert invert = new Invert(a);
-invert.tick(); // returns Status.FAILURE
-```
-
-### AlwaysSuccess / AlwaysFailure
-
-```java
-Action a = new Action(() -> Status.FAILURE);
-AlwaysSuccess alwaysSuccess = new AlwaysSuccess(a);
-alwaysSuccess.tick(); // returns Status.SUCCESS
-
-Action b = new Action(() -> Status.SUCCESS);
-AlwaysFailure alwaysFailure = new AlwaysFailure(b);
-alwaysFailure.tick(); // returns Status.FAILURE
-```
-
-### WhileSuccess / WhileFailure
-
-```java
-AtomicInteger count = new AtomicInteger(0);
-Action a = new Action(() -> count.incrementAndGet() < 3 ? Status.SUCCESS : Status.FAILURE);
-WhileSuccess ws = new WhileSuccess(a);
-ws.tick(); // returns Status.RUNNING until failure
-
-AtomicInteger count2 = new AtomicInteger(0);
-Action b = new Action(() -> count2.incrementAndGet() < 3 ? Status.FAILURE : Status.SUCCESS);
-WhileFailure wf = new WhileFailure(b);
-wf.tick(); // returns Status.RUNNING until success
-```
-
-### WithTimeout
-
-```java
-Action running = new Action(() -> Status.RUNNING);
-WithTimeout timeout = new WithTimeout(running, Duration.ofMillis(100));
-timeout.tick(); // returns Status.RUNNING, then Status.FAILURE after timeout
-```
-
-### Log
-
-```java
-Action a = new Action(() -> Status.SUCCESS);
-Log log = new Log(a, "Action executed");
-log.tick(); // logs the status and returns Status.SUCCESS
-```
-
-## Class Overview
+// See the test suite for more advanced and edge-case scenarios.
 
 **Core Classes:**
 
