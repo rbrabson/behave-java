@@ -2,17 +2,34 @@ package behave;
 
 import java.util.List;
 
-// Selector node that ticks its child nodes in order until one succeeds, returning the first success or the last failure.
+/**
+ * The Selector class is a composite node in a behavior tree that evaluates its
+ * child nodes in order until one of them returns SUCCESS. If a child node
+ * returns FAILURE, the Selector moves on to the next child. If a child node
+ * returns RUNNING, the Selector returns RUNNING and will continue ticking that
+ * child on the next tick. If all child nodes return FAILURE, the Selector
+ * returns FAILURE. This node is useful for creating behaviors that should try
+ * multiple options until one succeeds, such as trying different paths to reach
+ * a target.
+ */
 public class Selector implements Node {
     private final List<Node> children;
     private Status status = Status.READY;
 
-    // Constructor takes a list of child nodes to evaluate in order.
+    /**
+     * Constructor takes a list of child nodes to evaluate in order.
+     *
+     * @param children The list of child nodes to evaluate.
+     */
     public Selector(List<Node> children) {
         this.children = children;
     }
 
-    // Resets all child nodes and sets this node's status to READY.
+    /**
+     * Resets all child nodes and sets this node's status to READY.
+     *
+     * @return The status of this node after resetting (which will be READY).
+     */
     @Override
     public Status reset() {
         for (Node child : children) {
@@ -22,8 +39,12 @@ public class Selector implements Node {
         return status;
     }
 
-    // Ticks each child node in order until one succeeds, returning the first
-    // success or the last failure.
+    /**
+     * Ticks each child node in order until one succeeds, returning the first
+     * success or the last failure.
+     *
+     * @return The status of this node after ticking.
+     */
     @Override
     public Status tick() {
         for (Node child : children) {
@@ -45,13 +66,22 @@ public class Selector implements Node {
         return status;
     }
 
-    // Returns the current status of this node.
+    /**
+     * Returns the current status of this node.
+     * 
+     * @return The current status of this node.
+     */
     @Override
     public Status status() {
         return status;
     }
 
-    // Provides a string representation of this node, including its current status,
+    /**
+     * Provides a string representation of this node, including its current status,
+     * and the string representation of its child nodes.
+     *
+     * @return A string representation of this node.
+     */
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();

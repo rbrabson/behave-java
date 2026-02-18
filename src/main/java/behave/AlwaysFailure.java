@@ -1,16 +1,26 @@
 package behave;
 
-// Decorator node that always returns FAILURE, regardless of the child's status.
+/**
+ * Decorator node that always returns FAILURE, regardless of the child's status.
+ */
 public class AlwaysFailure implements Node {
     private final Node child;
     private Status status = Status.READY;
 
-    // Constructor takes a child node to decorate.
+    /**
+     * Constructor takes a child node to decorate.
+     *
+     * @param child The child node to decorate.
+     */
     public AlwaysFailure(Node child) {
         this.child = child;
     }
 
-    // Ticks the child node and always returns FAILURE.
+    /**
+     * Ticks the child node and always returns FAILURE.
+     *
+     * @return The current status of this node (which will always be FAILURE).
+     */
     @Override
     public Status tick() {
         if (child != null) {
@@ -20,7 +30,11 @@ public class AlwaysFailure implements Node {
         return status;
     }
 
-    // Resets the status to READY and resets the child node if it exists.
+    /**
+     * Resets the status to READY and resets the child node if it exists.
+     *
+     * @return The status of this node after resetting (which will be READY).
+     */
     @Override
     public Status reset() {
         status = Status.READY;
@@ -29,14 +43,22 @@ public class AlwaysFailure implements Node {
         return status;
     }
 
-    // Returns the current status of this node.
+    /**
+     * Returns the current status of this node.
+     *
+     * @return The current status of this node.
+     */
     @Override
     public Status status() {
         return status;
     }
 
-    // Provides a string representation of the node, including its current status
-    // and the child's representation.
+    /**
+     * Provides a string representation of the node, including its current status
+     * and the child's representation.
+     *
+     * @return A string representation of this node.
+     */
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();

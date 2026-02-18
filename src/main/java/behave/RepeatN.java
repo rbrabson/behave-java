@@ -1,21 +1,38 @@
 package behave;
 
-// RepeatN node that ticks its child node up to a specified number of times, returning the child's status on the final tick.
+/**
+ * The RepeatN class is a decorator node in a behavior tree that continuously
+ * ticks its child node until it has been ticked a specified number of times. If
+ * the child node returns SUCCESS or FAILURE, the RepeatN node resets the child
+ * and continues ticking until the maximum count is reached. Once the maximum
+ * count is reached, the RepeatN node returns the last status of the child node.
+ * This node is useful for creating behaviors that should repeat a certain
+ * number of times, such as attacking an enemy three times before retreating.
+ */
 public class RepeatN implements Node {
     private final Node child;
     private final int maxCount;
     private int count = 0;
     private Status status = Status.READY;
 
-    // Constructor takes a child node to decorate and the maximum number of times to
-    // tick it.
+    /**
+     * Constructor takes a child node to decorate and the maximum number of times to
+     * tick it.
+     *
+     * @param child    The child node to decorate.
+     * @param maxCount The maximum number of times to tick the child node.
+     */
     public RepeatN(Node child, int maxCount) {
         this.child = child;
         this.maxCount = maxCount;
     }
 
-    // Ticks the child node and updates the status of this node based on the child's
-    // status and the count, following the logic described above.
+    /**
+     * Ticks the child node and updates the status and count of this node based on
+     * the results, following the logic described above.
+     * 
+     * @return The current status of this node after ticking.
+     */
     @Override
     public Status tick() {
         if (child == null) {
@@ -41,7 +58,12 @@ public class RepeatN implements Node {
         return status;
     }
 
-    // Resets the count and status of this node, and resets the child node as well.
+    /**
+     * Resets the status to READY, resets the count to 0, and resets the child node
+     * if it exists.
+     *
+     * @return The status of this node after resetting (which will be READY).
+     */
     @Override
     public Status reset() {
         status = Status.READY;
@@ -51,15 +73,22 @@ public class RepeatN implements Node {
         return status;
     }
 
-    // Returns the current status of this node.
+    /**
+     * Returns the current status of this node.
+     * 
+     * @return The current status of this node.
+     */
     @Override
     public Status status() {
         return status;
     }
 
-    // Provides a string representation of this node, including its current status,
-    // count, and max count,
-    // as well as the string representation of its child.
+    /**
+     * Provides a string representation of this node, including its current status,
+     * count, and max count, as well as the string representation of its child.
+     *
+     * @return A string representation of this node.
+     */
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
