@@ -23,10 +23,14 @@ public class AlwaysSuccess implements Node {
      */
     @Override
     public Status tick() {
-        if (child != null) {
-            child.tick();
+        if (child == null) {
+            status = Status.SUCCESS;
+        } else {
+            status = child.tick();
+            if (status != Status.RUNNING) {
+                status = Status.SUCCESS;
+            }
         }
-        status = Status.SUCCESS;
         return status;
     }
 

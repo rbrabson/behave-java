@@ -192,10 +192,16 @@ public class BehaviorTreeTest {
 
     @Test
     void testAlwaysSuccessAllBranches() {
-        // Child returns all statuses, AlwaysSuccess should always return SUCCESS
+        // Child returns all statuses, AlwaysSuccess should return SUCCESS unless child
+        // returns RUNNING
         for (Status s : Status.values()) {
             AlwaysSuccess as = new AlwaysSuccess(new Action(() -> s));
-            assertEquals(Status.SUCCESS, as.tick());
+            as.tick();
+            if (s == Status.RUNNING) {
+                assertEquals(Status.RUNNING, as.tick());
+            } else {
+                assertEquals(Status.SUCCESS, as.tick());
+            }
         }
         // Child is null
         AlwaysSuccess asNull = new AlwaysSuccess(null);
@@ -204,10 +210,16 @@ public class BehaviorTreeTest {
 
     @Test
     void testAlwaysFailureAllBranches() {
-        // Child returns all statuses, AlwaysFailure should always return FAILURE
+        // Child returns all statuses, AlwaysFailure should return FAILURE unless child
+        // returns RUNNING
         for (Status s : Status.values()) {
             AlwaysFailure af = new AlwaysFailure(new Action(() -> s));
-            assertEquals(Status.FAILURE, af.tick());
+            af.tick();
+            if (s == Status.RUNNING) {
+                assertEquals(Status.RUNNING, af.tick());
+            } else {
+                assertEquals(Status.FAILURE, af.tick());
+            }
         }
         // Child is null
         AlwaysFailure afNull = new AlwaysFailure(null);

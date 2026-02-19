@@ -17,16 +17,20 @@ public class AlwaysFailure implements Node {
     }
 
     /**
-     * Ticks the child node and always returns FAILURE.
+     * Ticks the child node and always returns RUNNING or FAILURE.
      *
      * @return The current status of this node (which will always be FAILURE).
      */
     @Override
     public Status tick() {
-        if (child != null) {
-            child.tick();
+        if (child == null) {
+            status = Status.FAILURE;
+        } else {
+            status = child.tick();
+            if (status != Status.RUNNING) {
+                status = Status.FAILURE;
+            }
         }
-        status = Status.FAILURE;
         return status;
     }
 
