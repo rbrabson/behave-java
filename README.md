@@ -65,7 +65,7 @@ import behave.*;
 
 // Define custom actions and conditions
 Action myAction = new Action(() -> Status.SUCCESS);
-Condition myCondition = new Condition(() -> true ? Status.SUCCESS : Status.FAILURE);
+Condition myCondition = new Condition(() -> true);
 
 // Build a simple behavior tree
 Sequence sequence = new Sequence(Arrays.asList(myCondition, myAction));
@@ -189,7 +189,7 @@ import behave.*;
 import java.util.*;
 
 // Condition: Is enemy visible?
-Condition enemyVisible = new Condition(() -> isEnemyVisible() ? Status.SUCCESS : Status.FAILURE);
+Condition enemyVisible = new Condition(() -> isEnemyVisible());
 
 // Action: Attack enemy
 Action attack = new Action(() -> attackEnemy());
@@ -269,7 +269,7 @@ tree.tick();
 import behave.*;
 import java.util.*;
 
-Condition hasAmmo = new Condition(() -> hasAmmo() ? Status.SUCCESS : Status.FAILURE);
+Condition hasAmmo = new Condition(() -> hasAmmo());
 Action reload = new Action(() -> reloadWeapon());
 Action shoot = new Action(() -> shootWeapon());
 

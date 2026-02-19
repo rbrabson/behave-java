@@ -8,13 +8,12 @@ package behave;
  */
 public class Condition implements Node {
     private final ConditionFunction check;
-    private Status status = Status.READY;
 
     /**
      * Functional interface for the condition function that returns a Status.
      */
     public interface ConditionFunction {
-        Status check();
+        boolean check();
     }
 
     /**
@@ -34,22 +33,7 @@ public class Condition implements Node {
     // status based on its result.
     @Override
     public Status tick() {
-        if (check == null) {
-            status = Status.FAILURE;
-            return status;
-        }
-        Status s = check.check();
-        switch (s) {
-        case READY:
-        case RUNNING:
-        case SUCCESS:
-        case FAILURE:
-            status = s;
-            return status;
-        default:
-            status = Status.FAILURE;
-            return status;
-        }
+        return status();
     }
 
     /**
@@ -59,8 +43,7 @@ public class Condition implements Node {
      */
     @Override
     public Status reset() {
-        status = Status.READY;
-        return status;
+        return Status.READY;
     }
 
     /**
@@ -70,7 +53,10 @@ public class Condition implements Node {
      */
     @Override
     public Status status() {
-        return status;
+        if (check == null) {
+            return Status.FAILURE;
+        }
+        return check.check() ? Status.SUCCESS : Status.FAILURE;
     }
 
     /**
@@ -80,6 +66,6 @@ public class Condition implements Node {
      */
     @Override
     public String toString() {
-        return "Condition (" + status + ")";
+        return "Condition (" + status() + ")";
     }
 }

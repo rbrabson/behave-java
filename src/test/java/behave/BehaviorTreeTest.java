@@ -299,7 +299,7 @@ public class BehaviorTreeTest {
     // --- Additional tests for 80%+ coverage ---
     @Test
     void testCompositeToStringAndReset() {
-        Condition c1 = new Condition(() -> Status.SUCCESS);
+        Condition c1 = new Condition(() -> true);
         Action a = new Action(() -> Status.SUCCESS);
         Composite composite = new Composite(Arrays.asList(c1), a);
         composite.tick();
@@ -390,7 +390,7 @@ public class BehaviorTreeTest {
 
     @Test
     void testConditionToStringAndReset() {
-        Condition c = new Condition(() -> Status.SUCCESS);
+        Condition c = new Condition(() -> true);
         c.tick();
         assertTrue(c.toString().contains("Condition"));
         assertEquals(Status.READY, c.reset());
@@ -450,8 +450,8 @@ public class BehaviorTreeTest {
 
     @Test
     void testCompositeAllConditionsRunning() {
-        Condition running = new Condition(() -> Status.RUNNING);
-        Action a = new Action(() -> Status.SUCCESS);
+        Condition running = new Condition(() -> true);
+        Action a = new Action(() -> Status.RUNNING);
         Composite composite = new Composite(Arrays.asList(running), a);
         assertEquals(Status.RUNNING, composite.tick());
     }
@@ -734,14 +734,6 @@ public class BehaviorTreeTest {
     }
 
     @Test
-    void testConditionAllStatuses() {
-        for (Status s : Status.values()) {
-            Condition c = new Condition(() -> s);
-            assertEquals(s, c.tick());
-        }
-    }
-
-    @Test
     void testConditionNullFunction() {
         Condition c = new Condition(null);
         assertEquals(Status.FAILURE, c.tick());
@@ -780,7 +772,7 @@ public class BehaviorTreeTest {
 
     @Test
     void testCompositeWithFailingCondition() {
-        Condition fail = new Condition(() -> Status.FAILURE);
+        Condition fail = new Condition(() -> false);
         Action a = new Action(() -> Status.SUCCESS);
         Composite composite = new Composite(Arrays.asList(fail), a);
         assertEquals(Status.FAILURE, composite.tick());
@@ -839,7 +831,7 @@ public class BehaviorTreeTest {
 
     @Test
     void testConditionFailure() {
-        Condition condition = new Condition(() -> Status.FAILURE);
+        Condition condition = new Condition(() -> false);
         assertEquals(Status.FAILURE, condition.tick());
     }
 
@@ -902,8 +894,8 @@ public class BehaviorTreeTest {
 
     @Test
     void testComposite() {
-        Condition c1 = new Condition(() -> Status.SUCCESS);
-        Condition c2 = new Condition(() -> Status.SUCCESS);
+        Condition c1 = new Condition(() -> true);
+        Condition c2 = new Condition(() -> true);
         Action a = new Action(() -> Status.SUCCESS);
         Composite composite = new Composite(Arrays.asList(c1, c2), a);
         assertEquals(Status.SUCCESS, composite.tick());
