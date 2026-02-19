@@ -55,7 +55,7 @@ public class Sequence implements Node {
             }
             switch (s) {
             case SUCCESS:
-                break;
+                continue;
             case READY:
             case RUNNING:
             case FAILURE:
