@@ -30,8 +30,7 @@ public class Parallel implements Node {
     }
 
     /**
-     * Constructor takes a list of child nodes and defaults the minimum number of
-     * successes required to 1.
+     * Constructor takes a list of child nodes and defaults all children succeeding.
      *
      * @param children The list of child nodes.
      */
