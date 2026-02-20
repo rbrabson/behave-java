@@ -27,6 +27,12 @@ public class Parallel implements Node {
     public Parallel(List<Node> children, int minSuccessCount) {
         this.children = children;
         this.minSuccessCount = minSuccessCount;
+        if (minSuccessCount <= 0) {
+            this.minSuccessCount = 1;
+        }
+        if (minSuccessCount > children.size()) {
+            this.minSuccessCount = children.size();
+        }
     }
 
     /**
@@ -62,10 +68,7 @@ public class Parallel implements Node {
             status = Status.SUCCESS;
             return status;
         }
-        if (minSuccessCount <= 0)
-            minSuccessCount = 1;
-        if (minSuccessCount > children.size())
-            minSuccessCount = children.size();
+
         int successCount = 0, runningCount = 0;
         for (Node child : children) {
             Status s = child.tick();
@@ -77,11 +80,11 @@ public class Parallel implements Node {
             case SUCCESS:
                 successCount++;
                 break;
-            case FAILURE:
-                break;
             case RUNNING:
-            case READY:
                 runningCount++;
+                break;
+            case FAILURE:
+            case READY:
                 break;
             }
         }
