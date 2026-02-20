@@ -35,7 +35,7 @@ public class Parallel implements Node {
      * @param children The list of child nodes.
      */
     public Parallel(List<Node> children) {
-        this(children, 1);
+        this(children, children.size());
     }
 
     /**
