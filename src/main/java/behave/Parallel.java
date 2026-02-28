@@ -1,6 +1,7 @@
 package behave;
 
 import java.util.List;
+import java.util.Arrays;
 
 /**
  * The Parallel class is a composite node in a behavior tree that ticks all of
@@ -20,13 +21,11 @@ public class Parallel implements Node {
      * Constructor takes a list of child nodes and the minimum number of successes
      * required for this node to succeed.
      *
-     * @param children        The list of child nodes.
-     * @param minSuccessCount The minimum number of successes required for this node
-     *                        to succeed.
+     * @param children The list of child nodes.
      */
-    public Parallel(List<Node> children, int minSuccessCount) {
+    public Parallel(List<Node> children) {
         this.children = children;
-        this.minSuccessCount = minSuccessCount;
+        this.minSuccessCount = children.size();
         if (minSuccessCount <= 0) {
             this.minSuccessCount = 1;
         }
@@ -36,12 +35,24 @@ public class Parallel implements Node {
     }
 
     /**
-     * Constructor takes a list of child nodes and defaults all children succeeding.
-     *
-     * @param children The list of child nodes.
+     * Constructor takes an array of child nodes and the minimum number of successes
+     * required for this node to succeed.
+     * 
+     * @param children The array of child nodes.
      */
-    public Parallel(List<Node> children) {
-        this(children, children.size());
+    public Parallel(Node... children) {
+        this(Arrays.asList(children));
+    }
+
+    public Parallel withMinSuccess(int minSuccessCount) {
+        if (minSuccessCount <= 0) {
+            this.minSuccessCount = 1;
+        } else if (minSuccessCount > children.size()) {
+            this.minSuccessCount = children.size();
+        } else {
+            this.minSuccessCount = minSuccessCount;
+        }
+        return this;
     }
 
     /**

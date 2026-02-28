@@ -1,5 +1,6 @@
 package behave;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -23,6 +24,15 @@ public class Selector implements Node {
      */
     public Selector(List<Node> children) {
         this.children = children;
+    }
+
+    /**
+     * Constructor takes an array of child nodes to evaluate in order.
+     * 
+     * @param children The array of child nodes to evaluate.
+     */
+    public Selector(Node... children) {
+        this(Arrays.asList(children));
     }
 
     /**

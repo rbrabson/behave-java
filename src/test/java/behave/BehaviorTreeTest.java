@@ -323,7 +323,7 @@ public class BehaviorTreeTest {
     void testParallelToStringAndReset() {
         Action a1 = new Action(() -> Status.SUCCESS);
         Action a2 = new Action(() -> Status.FAILURE);
-        Parallel parallel = new Parallel(Arrays.asList(a1, a2), 1);
+        Parallel parallel = new Parallel(Arrays.asList(a1, a2)).withMinSuccess(1);
         parallel.tick();
         assertTrue(parallel.toString().contains("Parallel"));
         assertEquals(Status.READY, parallel.reset());
@@ -490,7 +490,7 @@ public class BehaviorTreeTest {
     @Test
     void testParallelMinSuccessZero() {
         Action a1 = new Action(() -> Status.SUCCESS);
-        Parallel parallel = new Parallel(Arrays.asList(a1), 0);
+        Parallel parallel = new Parallel(Arrays.asList(a1)).withMinSuccess(0);
         assertEquals(Status.SUCCESS, parallel.tick());
     }
 
@@ -498,7 +498,7 @@ public class BehaviorTreeTest {
     void testParallelAllSuccess() {
         Action a1 = new Action(() -> Status.SUCCESS);
         Action a2 = new Action(() -> Status.SUCCESS);
-        Parallel parallel = new Parallel(Arrays.asList(a1, a2), 2);
+        Parallel parallel = new Parallel(Arrays.asList(a1, a2)).withMinSuccess(2);
         assertEquals(Status.SUCCESS, parallel.tick());
     }
 
@@ -506,7 +506,7 @@ public class BehaviorTreeTest {
     void testParallelNotEnoughPossibleSuccesses() {
         Action fail = new Action(() -> Status.FAILURE);
         Action running = new Action(() -> Status.RUNNING);
-        Parallel parallel = new Parallel(Arrays.asList(fail, running), 2);
+        Parallel parallel = new Parallel(Arrays.asList(fail, running)).withMinSuccess(2);
         assertEquals(Status.FAILURE, parallel.tick());
     }
 
@@ -794,7 +794,7 @@ public class BehaviorTreeTest {
     void testParallelAllFail() {
         Action fail1 = new Action(() -> Status.FAILURE);
         Action fail2 = new Action(() -> Status.FAILURE);
-        Parallel parallel = new Parallel(Arrays.asList(fail1, fail2), 1);
+        Parallel parallel = new Parallel(Arrays.asList(fail1, fail2)).withMinSuccess(1);
         assertEquals(Status.FAILURE, parallel.tick());
     }
 
@@ -802,20 +802,20 @@ public class BehaviorTreeTest {
     void testParallelAllRunning() {
         Action running1 = new Action(() -> Status.RUNNING);
         Action running2 = new Action(() -> Status.RUNNING);
-        Parallel parallel = new Parallel(Arrays.asList(running1, running2), 1);
+        Parallel parallel = new Parallel(Arrays.asList(running1, running2)).withMinSuccess(1);
         assertEquals(Status.RUNNING, parallel.tick());
     }
 
     @Test
     void testParallelEmptyChildren() {
-        Parallel parallel = new Parallel(Arrays.asList(), 1);
+        Parallel parallel = new Parallel(Arrays.asList()).withMinSuccess(1);
         assertEquals(Status.SUCCESS, parallel.tick());
     }
 
     @Test
     void testParallelMinSuccessGreaterThanChildren() {
         Action success = new Action(() -> Status.SUCCESS);
-        Parallel parallel = new Parallel(Arrays.asList(success), 5);
+        Parallel parallel = new Parallel(Arrays.asList(success)).withMinSuccess(5);
         assertEquals(Status.SUCCESS, parallel.tick());
     }
 
@@ -867,7 +867,7 @@ public class BehaviorTreeTest {
     void testParallel() {
         Action a1 = new Action(() -> Status.SUCCESS);
         Action a2 = new Action(() -> Status.FAILURE);
-        Parallel parallel = new Parallel(Arrays.asList(a1, a2), 1);
+        Parallel parallel = new Parallel(Arrays.asList(a1, a2)).withMinSuccess(1);
         assertEquals(Status.SUCCESS, parallel.tick());
     }
 
