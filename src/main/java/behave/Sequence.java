@@ -17,8 +17,10 @@ public class Sequence implements Node {
     private final List<Node> children;
     private Status status = Status.READY;
 
+    private int childrenIndex = 0;
+
     /**
-     * Constructor takes a list of child nodes to evaluate in order.
+     * The constructor takes a list of child nodes to evaluate in order.
      *
      * @param children The list of child nodes to evaluate.
      */
@@ -27,9 +29,9 @@ public class Sequence implements Node {
     }
 
     /**
-     * Constructor takes an array of child nodes to evaluate in order.
-     * 
-     * @param children The array of child nodes to evaluate.
+     * A convenience constructor that takes a variable number of child nodes.
+     *
+     * @param children The child nodes to evaluate.
      */
     public Sequence(Node... children) {
         this(Arrays.asList(children));
@@ -57,7 +59,8 @@ public class Sequence implements Node {
      */
     @Override
     public Status tick() {
-        for (Node child : children) {
+        while (childrenIndex < children.size()) {
+            Node child = children.get(childrenIndex);
             Status s = child.tick();
             if (s == null) {
                 status = Status.FAILURE;
@@ -65,10 +68,10 @@ public class Sequence implements Node {
             }
             switch (s) {
             case SUCCESS:
+                childrenIndex++;
                 continue;
             case READY:
             case RUNNING:
-            case FAILURE:
                 status = s;
                 return status;
             default:
@@ -76,13 +79,14 @@ public class Sequence implements Node {
                 return status;
             }
         }
+
         status = Status.SUCCESS;
         return status;
     }
 
     /**
      * Returns the current status of this node.
-     * 
+     *
      * @return The current status of this node.
      */
     @Override
