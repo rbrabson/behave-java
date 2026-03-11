@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -721,7 +722,7 @@ public class BehaviorTreeTest {
 
     @Test
     void testCompositeEmptyConditionsWithNullChild() {
-        Composite composite = new Composite(Arrays.asList(), null);
+        Composite composite = new Composite(Collections.<Node>emptyList(), null);
         assertEquals(Status.FAILURE, composite.tick());
     }
 
@@ -733,7 +734,7 @@ public class BehaviorTreeTest {
                 return Status.SUCCESS;
             }
         });
-        Composite composite = new Composite(Arrays.asList(), a);
+        Composite composite = new Composite(Collections.<Node>emptyList(), a);
         assertEquals(Status.SUCCESS, composite.tick());
     }
 
@@ -1258,7 +1259,7 @@ public class BehaviorTreeTest {
 
     @Test
     void testParallelEmptyChildren() {
-        Parallel parallel = new Parallel(Arrays.asList()).withMinSuccess(1);
+        Parallel parallel = new Parallel(Collections.<Node>emptyList()).withMinSuccess(1);
         assertEquals(Status.SUCCESS, parallel.tick());
     }
 
