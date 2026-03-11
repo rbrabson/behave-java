@@ -13,7 +13,7 @@ import java.util.Arrays;
  * configured, allowing for flexible behavior definitions.
  */
 public class Parallel implements Node {
-    private final List<Node> children;
+    private final List<? extends Node> children;
     private int minSuccessCount;
     private Status status = Status.READY;
 
@@ -23,7 +23,7 @@ public class Parallel implements Node {
      *
      * @param children The list of child nodes.
      */
-    public Parallel(List<Node> children) {
+    public Parallel(List<? extends Node> children) {
         this.children = children;
         this.minSuccessCount = children.size();
         if (minSuccessCount <= 0) {

@@ -10,7 +10,7 @@ import java.util.List;
  * conditions and child node.
  */
 public class Composite implements Node {
-    private final List<Node> conditions;
+    private final List<? extends Node> conditions;
     private final Node child;
     private Status status = Status.READY;
 
@@ -21,7 +21,7 @@ public class Composite implements Node {
      * @param conditions The list of condition nodes.
      * @param child      The child node to execute if all conditions succeed.
      */
-    public Composite(List<Node> conditions, Node child) {
+    public Composite(List<? extends Node> conditions, Node child) {
         this.conditions = conditions;
         this.child = child;
     }

@@ -14,7 +14,7 @@ import java.util.List;
  * a target.
  */
 public class Selector implements Node {
-    private final List<Node> children;
+    private final List<? extends Node> children;
     private Status status = Status.READY;
 
     /**
@@ -22,7 +22,7 @@ public class Selector implements Node {
      *
      * @param children The list of child nodes to evaluate.
      */
-    public Selector(List<Node> children) {
+    public Selector(List<? extends Node> children) {
         this.children = children;
     }
 

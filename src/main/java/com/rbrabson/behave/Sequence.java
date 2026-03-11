@@ -14,7 +14,7 @@ import java.util.List;
  * it on an enemy.
  */
 public class Sequence implements Node {
-    private final List<Node> children;
+    private final List<? extends Node> children;
     private Status status = Status.READY;
 
     private int childrenIndex = 0;
@@ -24,7 +24,7 @@ public class Sequence implements Node {
      *
      * @param children The list of child nodes to evaluate.
      */
-    public Sequence(List<Node> children) {
+    public Sequence(List<? extends Node> children) {
         this.children = children;
     }
 
