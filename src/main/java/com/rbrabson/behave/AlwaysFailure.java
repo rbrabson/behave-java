@@ -1,4 +1,4 @@
-package behave;
+package com.rbrabson.behave;
 
 /**
  * Decorator node that always returns FAILURE, regardless of the child's status.

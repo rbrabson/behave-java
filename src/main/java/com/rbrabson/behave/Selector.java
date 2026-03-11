@@ -1,39 +1,37 @@
-package behave;
+package com.rbrabson.behave;
 
 import java.util.Arrays;
 import java.util.List;
 
 /**
- * The Sequence class is a composite node in a behavior tree that evaluates its
- * child nodes in order until one of them returns FAILURE. If a child node
- * returns SUCCESS, the Sequence moves on to the next child. If a child node
- * returns RUNNING, the Sequence returns RUNNING and will continue ticking that
- * child on the next tick. If all child nodes return SUCCESS, the Sequence
- * returns SUCCESS. This node is useful for creating behaviors that should
- * perform a series of actions in order, such as picking up an item, then using
- * it on an enemy.
+ * The Selector class is a composite node in a behavior tree that evaluates its
+ * child nodes in order until one of them returns SUCCESS. If a child node
+ * returns FAILURE, the Selector moves on to the next child. If a child node
+ * returns RUNNING, the Selector returns RUNNING and will continue ticking that
+ * child on the next tick. If all child nodes return FAILURE, the Selector
+ * returns FAILURE. This node is useful for creating behaviors that should try
+ * multiple options until one succeeds, such as trying different paths to reach
+ * a target.
  */
-public class Sequence implements Node {
+public class Selector implements Node {
     private final List<Node> children;
     private Status status = Status.READY;
 
-    private int childrenIndex = 0;
-
     /**
-     * The constructor takes a list of child nodes to evaluate in order.
+     * Constructor takes a list of child nodes to evaluate in order.
      *
      * @param children The list of child nodes to evaluate.
      */
-    public Sequence(List<Node> children) {
+    public Selector(List<Node> children) {
         this.children = children;
     }
 
     /**
-     * A convenience constructor that takes a variable number of child nodes.
-     *
-     * @param children The child nodes to evaluate.
+     * Constructor takes an array of child nodes to evaluate in order.
+     * 
+     * @param children The array of child nodes to evaluate.
      */
-    public Sequence(Node... children) {
+    public Selector(Node... children) {
         this(Arrays.asList(children));
     }
 
@@ -52,26 +50,25 @@ public class Sequence implements Node {
     }
 
     /**
-     * Ticks each child node in order until one fails, returning the first failure
-     * or the last success.
+     * Ticks each child node in order until one succeeds, returning the first
+     * success or the last failure.
      *
      * @return The status of this node after ticking.
      */
     @Override
     public Status tick() {
-        while (childrenIndex < children.size()) {
-            Node child = children.get(childrenIndex);
+        for (Node child : children) {
             Status s = child.tick();
             if (s == null) {
                 status = Status.FAILURE;
                 return status;
             }
             switch (s) {
-            case SUCCESS:
-                childrenIndex++;
-                continue;
+            case FAILURE:
+                break;
             case READY:
             case RUNNING:
+            case SUCCESS:
                 status = s;
                 return status;
             default:
@@ -79,14 +76,13 @@ public class Sequence implements Node {
                 return status;
             }
         }
-
-        status = Status.SUCCESS;
+        status = Status.FAILURE;
         return status;
     }
 
     /**
      * Returns the current status of this node.
-     *
+     * 
      * @return The current status of this node.
      */
     @Override
@@ -103,7 +99,7 @@ public class Sequence implements Node {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("Sequence (" + status + ")");
+        builder.append("Selector (" + status + ")");
         for (Node child : children) {
             String[] lines = child.toString().split("\n");
             for (String line : lines) {

@@ -1,4 +1,4 @@
-package behave;
+package com.rbrabson.behave;
 
 /**
  * The Action node is a leaf node in the behavior tree that performs a specific

@@ -1,4 +1,4 @@
-package behave;
+package com.rbrabson.behave;
 
 /**
  * The BehaviorTree class represents the root of a behavior tree structure. It

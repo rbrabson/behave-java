@@ -1,13 +1,9 @@
-package behave;
+package com.rbrabson.behave;
 
 /**
- * The Forever class is a decorator node in a behavior tree that continuously
- * ticks its child node and always returns RUNNING. This node is useful for
- * creating behaviors that should run indefinitely until interrupted. The status
- * of the Forever node is always RUNNING, regardless of the status of its child
- * node.
+ * Decorator node that always returns SUCCESS, regardless of the child's status.
  */
-public class Forever implements Node {
+public class AlwaysSuccess implements Node {
     private final Node child;
     private Status status = Status.READY;
 
@@ -16,22 +12,25 @@ public class Forever implements Node {
      *
      * @param child The child node to decorate.
      */
-    public Forever(Node child) {
+    public AlwaysSuccess(Node child) {
         this.child = child;
     }
 
     /**
-     * Ticks the child node and always returns RUNNING.
+     * Ticks the child node and always returns SUCCESS.
      *
-     * @return The current status of this node after ticking (which will be
-     *         RUNNING).
+     * @return The current status of this node (which will always be SUCCESS).
      */
     @Override
     public Status tick() {
-        if (child != null) {
-            child.tick();
+        if (child == null) {
+            status = Status.SUCCESS;
+        } else {
+            status = child.tick();
+            if (status != Status.RUNNING) {
+                status = Status.SUCCESS;
+            }
         }
-        status = Status.RUNNING;
         return status;
     }
 
@@ -59,14 +58,15 @@ public class Forever implements Node {
     }
 
     /**
-     * Provides a string representation of the node, including its current status.
+     * Provides a string representation of the node, including its current status
+     * and the child's representation.
      *
      * @return A string representation of this node.
      */
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("Forever (" + status + ")");
+        builder.append("AlwaysSuccess (" + status + ")");
         if (child != null) {
             String[] lines = child.toString().split("\n");
             builder.append("\n  " + lines[0]);

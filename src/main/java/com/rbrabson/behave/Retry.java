@@ -1,4 +1,4 @@
-package behave;
+package com.rbrabson.behave;
 
 /**
  * The Retry class is a decorator node in a behavior tree that continuously

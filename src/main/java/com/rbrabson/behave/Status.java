@@ -1,4 +1,4 @@
-package behave;
+package com.rbrabson.behave;
 
 /**
  * The Status enum represents the possible states of a node in a behavior tree.

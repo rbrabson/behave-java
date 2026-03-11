@@ -1,4 +1,4 @@
-package behave;
+package com.rbrabson.behave;
 
 /**
  * The Node interface defines the basic structure for all nodes in a behavior

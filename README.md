@@ -7,12 +7,11 @@ behave-java is a Java library for building and executing behavior trees. It prov
 
 ### Main Package Structure
 
-- `behave.Action` — Represents an executable action node.
-- `behave.Condition` — Represents a condition node.
-- `behave.Composite` — Base class for composite nodes (e.g., Sequence, Selector, Parallel).
-- `behave.Decorator` — Base class for decorator nodes (e.g., Invert, Repeat, Retry).
-- `behave.BehaviorTree` — The root node for executing a tree.
-- `behave.Status` — Enum for node execution status (SUCCESS, FAILURE, RUNNING).
+- `com.rbrabson.behave.Action` — Represents an executable action node.
+- `com.rbrabson.behave.Condition` — Represents a condition node.
+- `com.rbrabson.behave.Composite` — Base class for composite nodes (e.g., Sequence, Selector, Parallel).
+- `com.rbrabson.behave.BehaviorTree` — The root node for executing a tree.
+- `com.rbrabson.behave.Status` — Enum for node execution status (SUCCESS, FAILURE, RUNNING).
 
 **Core Classes:**
 
@@ -43,7 +42,7 @@ behave-java is a Java library for building and executing behavior trees. It prov
 - `WithTimeout`: Runs its child, but fails if it takes longer than a specified duration.
 - `Log`: Logs the status of its child each tick.
 
-See the source files in `src/main/java/behave/` for implementation details.
+See the source files in `src/main/java/com/rbrabson/behave/` for implementation details.
 
 ## Behvior Tree
 
@@ -61,7 +60,7 @@ A Java implementation of a flexible behavior tree framework, inspired by the Go 
 ### Example: Building a Behavior Tree
 
 ```java
-import behave.*;
+import com.rbrabson.behave.*;
 
 // Define custom actions and conditions
 Action myAction = new Action(() -> Status.SUCCESS);
@@ -108,27 +107,35 @@ behave-java/
 ├── src/
 │   ├── main/
 │   │   └── java/
-│   │       └── behave/
-│   │           ├── Action.java
-│   │           ├── AlwaysFailure.java
-│   │           ├── AlwaysSuccess.java
-│   │           ├── BehaviorTree.java
-│   │           ├── Composite.java
-│   │           ├── Condition.java
-│   │           ├── Forever.java
-│   │           ├── Invert.java
-│   │           ├── Log.java
-│   │           ├── Node.java
-│   │           ├── Parallel.java
-│   │           ├── Repeat.java
-│   │           ├── RepeatN.java
-│   │           ├── Retry.java
-│   │           ├── Selector.java
-│   │           ├── Sequence.java
-│   │           ├── Status.java
-│   │           ├── WhileFailure.java
-│   │           ├── WhileSuccess.java
-│   │           └── WithTimeout.java
+│   │       └── com/
+│   │           └── rbrabson/
+│   │               └── behave/
+│   │                   ├── Action.java
+│   │                   ├── AlwaysFailure.java
+│   │                   ├── AlwaysSuccess.java
+│   │                   ├── BehaviorTree.java
+│   │                   ├── Composite.java
+│   │                   ├── Condition.java
+│   │                   ├── Forever.java
+│   │                   ├── Invert.java
+│   │                   ├── Log.java
+│   │                   ├── Node.java
+│   │                   ├── Parallel.java
+│   │                   ├── Repeat.java
+│   │                   ├── RepeatN.java
+│   │                   ├── Retry.java
+│   │                   ├── Selector.java
+│   │                   ├── Sequence.java
+│   │                   ├── Status.java
+│   │                   ├── WhileFailure.java
+│   │                   ├── WhileSuccess.java
+│   │                   └── WithTimeout.java
+│   └── test/
+│       └── java/
+│           └── com/
+│               └── rbrabson/
+│                   └── behave/
+│                       └── BehaviorTreeTest.java
 ```
 
 ## Usage Examples
@@ -139,7 +146,7 @@ Below are examples demonstrating how to use each class in the behave package. Th
 
 ```java
 // Create a simple behavior tree with an Action node
-import behave.*;
+import com.rbrabson.behave.*;
 
 BehaviorTree tree = new BehaviorTree(new Action(() -> Status.SUCCESS));
 tree.tick(); // returns Status.SUCCESS
@@ -152,7 +159,7 @@ Below are real-world inspired examples demonstrating how to use the behave packa
 This example demonstrates how to use a behavior tree to manage the state of a custom class, similar to the `testUsingClassForAction` test case:
 
 ```java
-import behave.*;
+import com.rbrabson.behave.*;
 
 // A class whose method will be used as an action in the behavior tree
 class Counter {
@@ -185,7 +192,7 @@ public class Example {
 ### Example 2: Simple AI Agent (Patrol or Attack)
 
 ```java
-import behave.*;
+import com.rbrabson.behave.*;
 import java.util.*;
 
 // Condition: Is enemy visible?
@@ -215,7 +222,7 @@ Status patrolArea() { /* ... */ return Status.SUCCESS; }
 ### Example 3: Retry and Timeout for Robust Actions
 
 ```java
-import behave.*;
+import com.rbrabson.behave.*;
 import java.time.Duration;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -233,7 +240,7 @@ tree.tick();
 ### Example 4: Parallel Node for Multi-Tasking
 
 ```java
-import behave.*;
+import com.rbrabson.behave.*;
 import java.util.*;
 
 Action scan = new Action(() -> scanForThreats());
@@ -252,7 +259,7 @@ Status moveToWaypoint() { /* ... */ return Status.SUCCESS; }
 ### Example 5: Logging and Decorators
 
 ```java
-import behave.*;
+import com.rbrabson.behave.*;
 import java.util.logging.Level;
 
 Action a = new Action(() -> Status.SUCCESS);
@@ -266,7 +273,7 @@ tree.tick();
 ### Example 6: Custom Composite with Conditions
 
 ```java
-import behave.*;
+import com.rbrabson.behave.*;
 import java.util.*;
 
 Condition hasAmmo = new Condition(() -> hasAmmo());

@@ -1,4 +1,4 @@
-package behave;
+package com.rbrabson.behave;
 
 /**
  * The Condition class represents a leaf node in a behavior tree that evaluates

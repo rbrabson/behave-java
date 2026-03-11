@@ -1,4 +1,4 @@
-package behave;
+package com.rbrabson.behave;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package behave;
+package com.rbrabson.behave;
 
 import org.junit.jupiter.api.Test;
 

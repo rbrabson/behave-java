@@ -1,16 +1,14 @@
-package behave;
+package com.rbrabson.behave;
 
 /**
- * The WhileSuccess class is a decorator node in a behavior tree that
- * continuously ticks its child node until the child returns FAILURE. If the
- * child returns SUCCESS, the WhileSuccess node resets the child and continues
- * ticking it on the next tick. If the child returns RUNNING, the WhileSuccess
- * node returns RUNNING and will continue ticking that child on the next tick.
- * This node is useful for creating behaviors that should keep trying an action
- * until it fails, such as attempting to pick up an item until it finally fails
- * (e.g., because the item is no longer there).
+ * The Invert class is a decorator node in a behavior tree that inverts the
+ * status of its child node. If the child node returns SUCCESS, the Invert node
+ * returns FAILURE, and if the child node returns FAILURE, the Invert node
+ * returns SUCCESS. If the child node returns RUNNING or READY, the Invert node
+ * returns the same status. The Invert node is useful for creating behaviors
+ * that should succeed when a certain condition fails, and vice versa.
  */
-public class WhileSuccess implements Node {
+public class Invert implements Node {
     private final Node child;
     private Status status = Status.READY;
 
@@ -19,16 +17,15 @@ public class WhileSuccess implements Node {
      *
      * @param child The child node to decorate.
      */
-    public WhileSuccess(Node child) {
+    public Invert(Node child) {
         this.child = child;
     }
 
     /**
-     * Ticks the child node and updates the status of this node based on the child's
-     * status.
-     *
-     * @return The status of this node after ticking.
+     * Ticks the child node and inverts its status, updating the status of this node
+     * accordingly.
      */
+    // accordingly.
     @Override
     public Status tick() {
         if (child == null) {
@@ -40,19 +37,27 @@ public class WhileSuccess implements Node {
             status = Status.FAILURE;
             return status;
         }
-        if (childStatus == Status.RUNNING || childStatus == Status.SUCCESS) {
-            if (childStatus == Status.SUCCESS) {
-                child.reset();
-            }
+        switch (childStatus) {
+        case SUCCESS:
+            status = Status.FAILURE;
+            return status;
+        case FAILURE:
+            status = Status.SUCCESS;
+            return status;
+        case RUNNING:
             status = Status.RUNNING;
             return status;
+        case READY:
+            status = Status.READY;
+            return status;
+        default:
+            status = Status.FAILURE;
+            return status;
         }
-        status = Status.FAILURE;
-        return status;
     }
 
     /**
-     * Resets this node and its child node, setting the status to READY.
+     * Resets the status to READY and resets the child node if it exists.
      *
      * @return The status of this node after resetting (which will be READY).
      */
@@ -75,14 +80,14 @@ public class WhileSuccess implements Node {
     }
 
     /**
-     * Provides a string representation of this node, including its current status.
+     * Provides a string representation of the node, including its current status.
      *
      * @return A string representation of this node.
      */
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("WhileSuccess (" + status + ")");
+        builder.append("Invert (" + status + ")");
         if (child != null) {
             String[] lines = child.toString().split("\n");
             builder.append("\n  " + lines[0]);
