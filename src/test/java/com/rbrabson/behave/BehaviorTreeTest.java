@@ -26,7 +26,12 @@ public class BehaviorTreeTest {
     @Test
     void testUsingClassForAction() {
         Counter counter = new Counter(5);
-        Action runTC = new Action(counter::tickUntilDone);
+        Action runTC = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return counter.tickUntilDone();
+            }
+        });
         BehaviorTree tree = new BehaviorTree(runTC);
         while (tree.tick() == Status.RUNNING) {
             // Loop until the tree returns SUCCESS
@@ -38,16 +43,36 @@ public class BehaviorTreeTest {
     @Test
     void testInvertAllBranches() {
         // Child returns SUCCESS
-        Invert invertSuccess = new Invert(new Action(() -> Status.SUCCESS));
+        Invert invertSuccess = new Invert(new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.SUCCESS;
+            }
+        }));
         assertEquals(Status.FAILURE, invertSuccess.tick());
         // Child returns FAILURE
-        Invert invertFailure = new Invert(new Action(() -> Status.FAILURE));
+        Invert invertFailure = new Invert(new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.FAILURE;
+            }
+        }));
         assertEquals(Status.SUCCESS, invertFailure.tick());
         // Child returns READY
-        Invert invertReady = new Invert(new Action(() -> Status.READY));
+        Invert invertReady = new Invert(new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.READY;
+            }
+        }));
         assertEquals(Status.READY, invertReady.tick());
         // Child returns null (default case)
-        Invert invertNull = new Invert(new Action(() -> null));
+        Invert invertNull = new Invert(new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return null;
+            }
+        }));
         assertEquals(Status.SUCCESS, invertNull.tick());
     }
 
@@ -81,32 +106,72 @@ public class BehaviorTreeTest {
         assertEquals(Status.RUNNING, repeat.tick());
         assertEquals(1, resetCount.get());
         // Child returns FAILURE
-        Repeat repeatFail = new Repeat(new Action(() -> Status.FAILURE));
+        Repeat repeatFail = new Repeat(new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.FAILURE;
+            }
+        }));
         assertEquals(Status.FAILURE, repeatFail.tick());
         // Child returns READY (default case)
-        Repeat repeatReady = new Repeat(new Action(() -> Status.READY));
+        Repeat repeatReady = new Repeat(new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.READY;
+            }
+        }));
         assertEquals(Status.FAILURE, repeatReady.tick());
         // Child returns null (default case)
-        Repeat repeatNull = new Repeat(new Action(() -> null));
+        Repeat repeatNull = new Repeat(new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return null;
+            }
+        }));
         assertEquals(Status.FAILURE, repeatNull.tick());
     }
 
     @Test
     void testLogAllBranches() {
         // Child returns SUCCESS, custom message and level
-        Log logSuccess = new Log(new Action(() -> Status.SUCCESS), "msg", java.util.logging.Level.INFO);
+        Log logSuccess = new Log(new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.SUCCESS;
+            }
+        }), "msg", java.util.logging.Level.INFO);
         assertEquals(Status.SUCCESS, logSuccess.tick());
         // Child returns FAILURE, no message, no level
-        Log logFail = new Log(new Action(() -> Status.FAILURE));
+        Log logFail = new Log(new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.FAILURE;
+            }
+        }));
         assertEquals(Status.FAILURE, logFail.tick());
         // Child returns RUNNING, null message, null level
-        Log logRunning = new Log(new Action(() -> Status.RUNNING), null, null);
+        Log logRunning = new Log(new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.RUNNING;
+            }
+        }), null, null);
         assertEquals(Status.RUNNING, logRunning.tick());
         // Child returns READY, null message, null level
-        Log logReady = new Log(new Action(() -> Status.READY), null, null);
+        Log logReady = new Log(new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.READY;
+            }
+        }), null, null);
         assertEquals(Status.READY, logReady.tick());
         // Child returns null (default case)
-        Log logNull = new Log(new Action(() -> null));
+        Log logNull = new Log(new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return null;
+            }
+        }));
         assertEquals(Status.FAILURE, logNull.tick());
     }
 
@@ -140,13 +205,28 @@ public class BehaviorTreeTest {
         assertEquals(Status.RUNNING, wf.tick());
         assertEquals(1, resetCount.get());
         // Child returns RUNNING
-        WhileFailure wfRunning = new WhileFailure(new Action(() -> Status.RUNNING));
+        WhileFailure wfRunning = new WhileFailure(new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.RUNNING;
+            }
+        }));
         assertEquals(Status.RUNNING, wfRunning.tick());
         // Child returns SUCCESS
-        WhileFailure wfSuccess = new WhileFailure(new Action(() -> Status.SUCCESS));
+        WhileFailure wfSuccess = new WhileFailure(new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.SUCCESS;
+            }
+        }));
         assertEquals(Status.SUCCESS, wfSuccess.tick());
         // Child returns null (default case)
-        WhileFailure wfNull = new WhileFailure(new Action(() -> null));
+        WhileFailure wfNull = new WhileFailure(new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return null;
+            }
+        }));
         assertEquals(Status.RUNNING, wfNull.tick());
     }
 
@@ -180,13 +260,28 @@ public class BehaviorTreeTest {
         assertEquals(Status.RUNNING, ws.tick());
         assertEquals(1, resetCount.get());
         // Child returns RUNNING
-        WhileSuccess wsRunning = new WhileSuccess(new Action(() -> Status.RUNNING));
+        WhileSuccess wsRunning = new WhileSuccess(new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.RUNNING;
+            }
+        }));
         assertEquals(Status.RUNNING, wsRunning.tick());
         // Child returns FAILURE
-        WhileSuccess wsFail = new WhileSuccess(new Action(() -> Status.FAILURE));
+        WhileSuccess wsFail = new WhileSuccess(new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.FAILURE;
+            }
+        }));
         assertEquals(Status.FAILURE, wsFail.tick());
         // Child returns null (default case)
-        WhileSuccess wsNull = new WhileSuccess(new Action(() -> null));
+        WhileSuccess wsNull = new WhileSuccess(new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return null;
+            }
+        }));
         assertEquals(Status.FAILURE, wsNull.tick());
     }
 
@@ -195,7 +290,12 @@ public class BehaviorTreeTest {
         // Child returns all statuses, AlwaysSuccess should return SUCCESS unless child
         // returns RUNNING
         for (Status s : Status.values()) {
-            AlwaysSuccess as = new AlwaysSuccess(new Action(() -> s));
+            AlwaysSuccess as = new AlwaysSuccess(new Action(new Action.ActionFunction() {
+
+                public Status run() {
+                    return s;
+                }
+            }));
             as.tick();
             if (s == Status.RUNNING) {
                 assertEquals(Status.RUNNING, as.tick());
@@ -213,7 +313,12 @@ public class BehaviorTreeTest {
         // Child returns all statuses, AlwaysFailure should return FAILURE unless child
         // returns RUNNING
         for (Status s : Status.values()) {
-            AlwaysFailure af = new AlwaysFailure(new Action(() -> s));
+            AlwaysFailure af = new AlwaysFailure(new Action(new Action.ActionFunction() {
+
+                public Status run() {
+                    return s;
+                }
+            }));
             af.tick();
             if (s == Status.RUNNING) {
                 assertEquals(Status.RUNNING, af.tick());
@@ -230,7 +335,12 @@ public class BehaviorTreeTest {
     void testForeverAllBranches() {
         // Child returns all statuses, Forever should always return RUNNING
         for (Status s : Status.values()) {
-            Forever f = new Forever(new Action(() -> s));
+            Forever f = new Forever(new Action(new Action.ActionFunction() {
+
+                public Status run() {
+                    return s;
+                }
+            }));
             assertEquals(Status.RUNNING, f.tick());
         }
         // Child is null
@@ -243,7 +353,12 @@ public class BehaviorTreeTest {
     void testInvertNullChildAndRunning() {
         Invert invert = new Invert(null);
         assertEquals(Status.FAILURE, invert.tick());
-        Action running = new Action(() -> Status.RUNNING);
+        Action running = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.RUNNING;
+            }
+        });
         Invert invert2 = new Invert(running);
         assertEquals(Status.RUNNING, invert2.tick());
     }
@@ -252,17 +367,32 @@ public class BehaviorTreeTest {
     void testRepeatNullChildAndRunning() {
         Repeat repeat = new Repeat(null);
         assertEquals(Status.FAILURE, repeat.tick());
-        Action running = new Action(() -> Status.RUNNING);
+        Action running = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.RUNNING;
+            }
+        });
         Repeat repeat2 = new Repeat(running);
         assertEquals(Status.RUNNING, repeat2.tick());
     }
 
     @Test
     void testLogLevelsAndNulls() {
-        Action running = new Action(() -> Status.RUNNING);
+        Action running = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.RUNNING;
+            }
+        });
         Log log = new Log(running, null, null);
         assertEquals(Status.RUNNING, log.tick());
-        Action ready = new Action(() -> Status.READY);
+        Action ready = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.READY;
+            }
+        });
         Log log2 = new Log(ready, null, null);
         assertEquals(Status.READY, log2.tick());
         Log log3 = new Log(null, null, null);
@@ -271,21 +401,36 @@ public class BehaviorTreeTest {
 
     @Test
     void testWithTimeoutDefaultCase() throws InterruptedException {
-        Action ready = new Action(() -> Status.READY);
+        Action ready = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.READY;
+            }
+        });
         WithTimeout wt = new WithTimeout(ready, Duration.ofMillis(10));
         assertEquals(Status.FAILURE, wt.tick());
     }
 
     @Test
     void testWhileFailureDefaultCase() {
-        Action nullStatus = new Action(() -> null);
+        Action nullStatus = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return null;
+            }
+        });
         WhileFailure wf = new WhileFailure(nullStatus);
         assertEquals(Status.RUNNING, wf.tick());
     }
 
     @Test
     void testWhileSuccessDefaultCase() {
-        Action nullStatus = new Action(() -> null);
+        Action nullStatus = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return null;
+            }
+        });
         WhileSuccess ws = new WhileSuccess(nullStatus);
         assertEquals(Status.FAILURE, ws.tick());
     }
@@ -311,8 +456,18 @@ public class BehaviorTreeTest {
     // --- Additional tests for 80%+ coverage ---
     @Test
     void testCompositeToStringAndReset() {
-        Condition c1 = new Condition(() -> true);
-        Action a = new Action(() -> Status.SUCCESS);
+        Condition c1 = new Condition(new Condition.ConditionFunction() {
+
+            public boolean check() {
+                return true;
+            }
+        });
+        Action a = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.SUCCESS;
+            }
+        });
         Composite composite = new Composite(Arrays.asList(c1), a);
         composite.tick();
         assertTrue(composite.toString().contains("Composite"));
@@ -321,8 +476,18 @@ public class BehaviorTreeTest {
 
     @Test
     void testParallelToStringAndReset() {
-        Action a1 = new Action(() -> Status.SUCCESS);
-        Action a2 = new Action(() -> Status.FAILURE);
+        Action a1 = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.SUCCESS;
+            }
+        });
+        Action a2 = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.FAILURE;
+            }
+        });
         Parallel parallel = new Parallel(Arrays.asList(a1, a2)).withMinSuccess(1);
         parallel.tick();
         assertTrue(parallel.toString().contains("Parallel"));
@@ -331,7 +496,12 @@ public class BehaviorTreeTest {
 
     @Test
     void testSequenceToStringAndReset() {
-        Action a1 = new Action(() -> Status.SUCCESS);
+        Action a1 = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.SUCCESS;
+            }
+        });
         Sequence sequence = new Sequence(Arrays.asList(a1));
         sequence.tick();
         assertTrue(sequence.toString().contains("Sequence"));
@@ -340,7 +510,12 @@ public class BehaviorTreeTest {
 
     @Test
     void testSelectorToStringAndReset() {
-        Action a1 = new Action(() -> Status.FAILURE);
+        Action a1 = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.FAILURE;
+            }
+        });
         Selector selector = new Selector(Arrays.asList(a1));
         selector.tick();
         assertTrue(selector.toString().contains("Selector"));
@@ -349,7 +524,12 @@ public class BehaviorTreeTest {
 
     @Test
     void testRepeatNToStringAndReset() {
-        Action a = new Action(() -> Status.SUCCESS);
+        Action a = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.SUCCESS;
+            }
+        });
         RepeatN repeatN = new RepeatN(a, 2);
         repeatN.tick();
         assertTrue(repeatN.toString().contains("RepeatN"));
@@ -358,7 +538,12 @@ public class BehaviorTreeTest {
 
     @Test
     void testRetryToStringAndReset() {
-        Action a = new Action(() -> Status.FAILURE);
+        Action a = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.FAILURE;
+            }
+        });
         Retry retry = new Retry(a);
         retry.tick();
         assertTrue(retry.toString().contains("Retry"));
@@ -367,7 +552,12 @@ public class BehaviorTreeTest {
 
     @Test
     void testWhileFailureToStringAndReset() {
-        Action a = new Action(() -> Status.FAILURE);
+        Action a = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.FAILURE;
+            }
+        });
         WhileFailure wf = new WhileFailure(a);
         wf.tick();
         assertTrue(wf.toString().contains("WhileFailure"));
@@ -376,7 +566,12 @@ public class BehaviorTreeTest {
 
     @Test
     void testWhileSuccessToStringAndReset() {
-        Action a = new Action(() -> Status.SUCCESS);
+        Action a = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.SUCCESS;
+            }
+        });
         WhileSuccess ws = new WhileSuccess(a);
         ws.tick();
         assertTrue(ws.toString().contains("WhileSuccess"));
@@ -385,7 +580,12 @@ public class BehaviorTreeTest {
 
     @Test
     void testLogToStringAndReset() {
-        Action a = new Action(() -> Status.SUCCESS);
+        Action a = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.SUCCESS;
+            }
+        });
         Log log = new Log(a, "msg");
         log.tick();
         assertTrue(log.toString().contains("Log"));
@@ -394,7 +594,12 @@ public class BehaviorTreeTest {
 
     @Test
     void testActionToStringAndReset() {
-        Action a = new Action(() -> Status.SUCCESS);
+        Action a = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.SUCCESS;
+            }
+        });
         a.tick();
         assertTrue(a.toString().contains("Action"));
         assertEquals(Status.READY, a.reset());
@@ -402,7 +607,12 @@ public class BehaviorTreeTest {
 
     @Test
     void testConditionToStringAndReset() {
-        Condition c = new Condition(() -> true);
+        Condition c = new Condition(new Condition.ConditionFunction() {
+
+            public boolean check() {
+                return true;
+            }
+        });
         c.tick();
         assertTrue(c.toString().contains("Condition"));
         assertEquals(Status.READY, c.reset());
@@ -410,7 +620,12 @@ public class BehaviorTreeTest {
 
     @Test
     void testAlwaysSuccessToStringAndReset() {
-        Action a = new Action(() -> Status.FAILURE);
+        Action a = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.FAILURE;
+            }
+        });
         AlwaysSuccess as = new AlwaysSuccess(a);
         as.tick();
         assertTrue(as.toString().contains("AlwaysSuccess"));
@@ -419,7 +634,12 @@ public class BehaviorTreeTest {
 
     @Test
     void testAlwaysFailureToStringAndReset() {
-        Action a = new Action(() -> Status.SUCCESS);
+        Action a = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.SUCCESS;
+            }
+        });
         AlwaysFailure af = new AlwaysFailure(a);
         af.tick();
         assertTrue(af.toString().contains("AlwaysFailure"));
@@ -428,7 +648,12 @@ public class BehaviorTreeTest {
 
     @Test
     void testForeverToStringAndReset() {
-        Action a = new Action(() -> Status.SUCCESS);
+        Action a = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.SUCCESS;
+            }
+        });
         Forever f = new Forever(a);
         f.tick();
         assertTrue(f.toString().contains("Forever"));
@@ -437,7 +662,12 @@ public class BehaviorTreeTest {
 
     @Test
     void testWithTimeoutToStringAndReset() {
-        Action a = new Action(() -> Status.SUCCESS);
+        Action a = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.SUCCESS;
+            }
+        });
         WithTimeout wt = new WithTimeout(a, Duration.ofMillis(10));
         wt.tick();
         assertTrue(wt.toString().contains("WithTimeout"));
@@ -446,7 +676,12 @@ public class BehaviorTreeTest {
 
     @Test
     void testBehaviorTreeToStringAndReset() {
-        Action a = new Action(() -> Status.SUCCESS);
+        Action a = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.SUCCESS;
+            }
+        });
         BehaviorTree tree = new BehaviorTree(a);
         tree.tick();
         assertTrue(tree.toString().contains("BehaviorTree"));
@@ -462,8 +697,18 @@ public class BehaviorTreeTest {
 
     @Test
     void testCompositeAllConditionsRunning() {
-        Condition running = new Condition(() -> true);
-        Action a = new Action(() -> Status.RUNNING);
+        Condition running = new Condition(new Condition.ConditionFunction() {
+
+            public boolean check() {
+                return true;
+            }
+        });
+        Action a = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.RUNNING;
+            }
+        });
         Composite composite = new Composite(Arrays.asList(running), a);
         assertEquals(Status.RUNNING, composite.tick());
     }
@@ -482,37 +727,72 @@ public class BehaviorTreeTest {
 
     @Test
     void testCompositeEmptyConditionsWithChild() {
-        Action a = new Action(() -> Status.SUCCESS);
+        Action a = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.SUCCESS;
+            }
+        });
         Composite composite = new Composite(Arrays.asList(), a);
         assertEquals(Status.SUCCESS, composite.tick());
     }
 
     @Test
     void testParallelMinSuccessZero() {
-        Action a1 = new Action(() -> Status.SUCCESS);
+        Action a1 = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.SUCCESS;
+            }
+        });
         Parallel parallel = new Parallel(Arrays.asList(a1)).withMinSuccess(0);
         assertEquals(Status.SUCCESS, parallel.tick());
     }
 
     @Test
     void testParallelAllSuccess() {
-        Action a1 = new Action(() -> Status.SUCCESS);
-        Action a2 = new Action(() -> Status.SUCCESS);
+        Action a1 = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.SUCCESS;
+            }
+        });
+        Action a2 = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.SUCCESS;
+            }
+        });
         Parallel parallel = new Parallel(Arrays.asList(a1, a2)).withMinSuccess(2);
         assertEquals(Status.SUCCESS, parallel.tick());
     }
 
     @Test
     void testParallelNotEnoughPossibleSuccesses() {
-        Action fail = new Action(() -> Status.FAILURE);
-        Action running = new Action(() -> Status.RUNNING);
+        Action fail = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.FAILURE;
+            }
+        });
+        Action running = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.RUNNING;
+            }
+        });
         Parallel parallel = new Parallel(Arrays.asList(fail, running)).withMinSuccess(2);
         assertEquals(Status.FAILURE, parallel.tick());
     }
 
     @Test
     void testSequenceAllReady() {
-        Action ready = new Action(() -> Status.READY);
+        Action ready = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.READY;
+            }
+        });
         Sequence sequence = new Sequence(Arrays.asList(ready, ready));
         assertEquals(Status.READY, sequence.tick());
     }
@@ -546,7 +826,12 @@ public class BehaviorTreeTest {
 
     @Test
     void testSelectorAllReady() {
-        Action ready = new Action(() -> Status.READY);
+        Action ready = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.READY;
+            }
+        });
         Selector selector = new Selector(Arrays.asList(ready, ready));
         assertEquals(Status.READY, selector.tick());
     }
@@ -580,14 +865,24 @@ public class BehaviorTreeTest {
 
     @Test
     void testRepeatNMaxCountNegative() {
-        Action a = new Action(() -> Status.SUCCESS);
+        Action a = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.SUCCESS;
+            }
+        });
         RepeatN repeatN = new RepeatN(a, -1);
         assertEquals(Status.RUNNING, repeatN.tick());
     }
 
     @Test
     void testRepeatNChildReturnsFailure() {
-        Action fail = new Action(() -> Status.FAILURE);
+        Action fail = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.FAILURE;
+            }
+        });
         RepeatN repeatN = new RepeatN(fail, 2);
         assertEquals(Status.RUNNING, repeatN.tick());
         assertEquals(Status.FAILURE, repeatN.tick());
@@ -595,90 +890,180 @@ public class BehaviorTreeTest {
 
     @Test
     void testRetryChildReturnsReady() {
-        Action ready = new Action(() -> Status.READY);
+        Action ready = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.READY;
+            }
+        });
         Retry retry = new Retry(ready);
         assertEquals(Status.RUNNING, retry.tick());
     }
 
     @Test
     void testWhileFailureChildReturnsReady() {
-        Action ready = new Action(() -> Status.READY);
+        Action ready = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.READY;
+            }
+        });
         WhileFailure whileFailure = new WhileFailure(ready);
         assertEquals(Status.RUNNING, whileFailure.tick());
     }
 
     @Test
     void testWhileSuccessChildReturnsReady() {
-        Action ready = new Action(() -> Status.READY);
+        Action ready = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.READY;
+            }
+        });
         WhileSuccess whileSuccess = new WhileSuccess(ready);
         assertEquals(Status.FAILURE, whileSuccess.tick());
     }
 
     @Test
     void testLogDefaultLevelAndNullMessage() {
-        Action a = new Action(() -> Status.SUCCESS);
+        Action a = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.SUCCESS;
+            }
+        });
         Log log = new Log(a);
         assertEquals(Status.SUCCESS, log.tick());
     }
 
     @Test
     void testSequenceAllSuccess() {
-        Action a1 = new Action(() -> Status.SUCCESS);
-        Action a2 = new Action(() -> Status.SUCCESS);
+        Action a1 = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.SUCCESS;
+            }
+        });
+        Action a2 = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.SUCCESS;
+            }
+        });
         Sequence sequence = new Sequence(Arrays.asList(a1, a2));
         assertEquals(Status.SUCCESS, sequence.tick());
     }
 
     @Test
     void testSequenceWithFailure() {
-        Action a1 = new Action(() -> Status.SUCCESS);
-        Action a2 = new Action(() -> Status.FAILURE);
+        Action a1 = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.SUCCESS;
+            }
+        });
+        Action a2 = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.FAILURE;
+            }
+        });
         Sequence sequence = new Sequence(Arrays.asList(a1, a2));
         assertEquals(Status.FAILURE, sequence.tick());
     }
 
     @Test
     void testSequenceWithRunning() {
-        Action a1 = new Action(() -> Status.SUCCESS);
-        Action a2 = new Action(() -> Status.RUNNING);
+        Action a1 = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.SUCCESS;
+            }
+        });
+        Action a2 = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.RUNNING;
+            }
+        });
         Sequence sequence = new Sequence(Arrays.asList(a1, a2));
         assertEquals(Status.RUNNING, sequence.tick());
     }
 
     @Test
     void testSelectorAllFailure() {
-        Action a1 = new Action(() -> Status.FAILURE);
-        Action a2 = new Action(() -> Status.FAILURE);
+        Action a1 = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.FAILURE;
+            }
+        });
+        Action a2 = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.FAILURE;
+            }
+        });
         Selector selector = new Selector(Arrays.asList(a1, a2));
         assertEquals(Status.FAILURE, selector.tick());
     }
 
     @Test
     void testSelectorWithSuccess() {
-        Action a1 = new Action(() -> Status.FAILURE);
-        Action a2 = new Action(() -> Status.SUCCESS);
+        Action a1 = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.FAILURE;
+            }
+        });
+        Action a2 = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.SUCCESS;
+            }
+        });
         Selector selector = new Selector(Arrays.asList(a1, a2));
         assertEquals(Status.SUCCESS, selector.tick());
     }
 
     @Test
     void testSelectorWithRunning() {
-        Action a1 = new Action(() -> Status.FAILURE);
-        Action a2 = new Action(() -> Status.RUNNING);
+        Action a1 = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.FAILURE;
+            }
+        });
+        Action a2 = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.RUNNING;
+            }
+        });
         Selector selector = new Selector(Arrays.asList(a1, a2));
         assertEquals(Status.RUNNING, selector.tick());
     }
 
     @Test
     void testRepeatNZeroMaxCount() {
-        Action a = new Action(() -> Status.SUCCESS);
+        Action a = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.SUCCESS;
+            }
+        });
         RepeatN repeatN = new RepeatN(a, 0);
         assertEquals(Status.RUNNING, repeatN.tick());
     }
 
     @Test
     void testRepeatNRunningChild() {
-        Action running = new Action(() -> Status.RUNNING);
+        Action running = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.RUNNING;
+            }
+        });
         RepeatN repeatN = new RepeatN(running, 2);
         assertEquals(Status.RUNNING, repeatN.tick());
     }
@@ -692,7 +1077,12 @@ public class BehaviorTreeTest {
     @Test
     void testRetrySuccessAfterFailure() {
         AtomicInteger count = new AtomicInteger(0);
-        Action a = new Action(() -> count.incrementAndGet() < 2 ? Status.FAILURE : Status.SUCCESS);
+        Action a = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return count.incrementAndGet() < 2 ? Status.FAILURE : Status.SUCCESS;
+            }
+        });
         Retry retry = new Retry(a);
         assertEquals(Status.RUNNING, retry.tick());
         assertEquals(Status.SUCCESS, retry.tick());
@@ -700,7 +1090,12 @@ public class BehaviorTreeTest {
 
     @Test
     void testRetryRunning() {
-        Action running = new Action(() -> Status.RUNNING);
+        Action running = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.RUNNING;
+            }
+        });
         Retry retry = new Retry(running);
         assertEquals(Status.RUNNING, retry.tick());
     }
@@ -713,14 +1108,24 @@ public class BehaviorTreeTest {
 
     @Test
     void testWithTimeoutSuccess() {
-        Action success = new Action(() -> Status.SUCCESS);
+        Action success = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.SUCCESS;
+            }
+        });
         WithTimeout timeout = new WithTimeout(success, Duration.ofMillis(100));
         assertEquals(Status.SUCCESS, timeout.tick());
     }
 
     @Test
     void testWithTimeoutFailure() {
-        Action fail = new Action(() -> Status.FAILURE);
+        Action fail = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.FAILURE;
+            }
+        });
         WithTimeout timeout = new WithTimeout(fail, Duration.ofMillis(100));
         assertEquals(Status.FAILURE, timeout.tick());
     }
@@ -734,7 +1139,12 @@ public class BehaviorTreeTest {
     @Test
     void testActionAllStatuses() {
         for (Status s : Status.values()) {
-            Action a = new Action(() -> s);
+            Action a = new Action(new Action.ActionFunction() {
+
+                public Status run() {
+                    return s;
+                }
+            });
             assertEquals(s, a.tick());
         }
     }
@@ -754,7 +1164,12 @@ public class BehaviorTreeTest {
     @Test
     void testRepeatDecoratorSuccessAndFailure() {
         AtomicInteger count = new AtomicInteger(0);
-        Action succeedTwice = new Action(() -> count.incrementAndGet() < 3 ? Status.SUCCESS : Status.FAILURE);
+        Action succeedTwice = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return count.incrementAndGet() < 3 ? Status.SUCCESS : Status.FAILURE;
+            }
+        });
         Repeat repeat = new Repeat(succeedTwice);
         assertEquals(Status.RUNNING, repeat.tick());
         assertEquals(Status.RUNNING, repeat.tick());
@@ -777,31 +1192,66 @@ public class BehaviorTreeTest {
 
     @Test
     void testCompositeWithNoConditionsButWithChild() {
-        Action a = new Action(() -> Status.SUCCESS);
+        Action a = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.SUCCESS;
+            }
+        });
         Composite composite = new Composite(null, a);
         assertEquals(Status.SUCCESS, composite.tick());
     }
 
     @Test
     void testCompositeWithFailingCondition() {
-        Condition fail = new Condition(() -> false);
-        Action a = new Action(() -> Status.SUCCESS);
+        Condition fail = new Condition(new Condition.ConditionFunction() {
+
+            public boolean check() {
+                return false;
+            }
+        });
+        Action a = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.SUCCESS;
+            }
+        });
         Composite composite = new Composite(Arrays.asList(fail), a);
         assertEquals(Status.FAILURE, composite.tick());
     }
 
     @Test
     void testParallelAllFail() {
-        Action fail1 = new Action(() -> Status.FAILURE);
-        Action fail2 = new Action(() -> Status.FAILURE);
+        Action fail1 = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.FAILURE;
+            }
+        });
+        Action fail2 = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.FAILURE;
+            }
+        });
         Parallel parallel = new Parallel(Arrays.asList(fail1, fail2)).withMinSuccess(1);
         assertEquals(Status.FAILURE, parallel.tick());
     }
 
     @Test
     void testParallelAllRunning() {
-        Action running1 = new Action(() -> Status.RUNNING);
-        Action running2 = new Action(() -> Status.RUNNING);
+        Action running1 = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.RUNNING;
+            }
+        });
+        Action running2 = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.RUNNING;
+            }
+        });
         Parallel parallel = new Parallel(Arrays.asList(running1, running2)).withMinSuccess(1);
         assertEquals(Status.RUNNING, parallel.tick());
     }
@@ -814,7 +1264,12 @@ public class BehaviorTreeTest {
 
     @Test
     void testParallelMinSuccessGreaterThanChildren() {
-        Action success = new Action(() -> Status.SUCCESS);
+        Action success = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.SUCCESS;
+            }
+        });
         Parallel parallel = new Parallel(Arrays.asList(success)).withMinSuccess(5);
         assertEquals(Status.SUCCESS, parallel.tick());
     }
@@ -827,14 +1282,24 @@ public class BehaviorTreeTest {
 
     @Test
     void testLogWithCustomLevel() {
-        Action a = new Action(() -> Status.SUCCESS);
+        Action a = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.SUCCESS;
+            }
+        });
         Log log = new Log(a, "Custom", java.util.logging.Level.SEVERE);
         assertEquals(Status.SUCCESS, log.tick());
     }
 
     @Test
     void testActionSuccess() {
-        Action action = new Action(() -> Status.SUCCESS);
+        Action action = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.SUCCESS;
+            }
+        });
         assertEquals(Status.SUCCESS, action.tick());
         assertEquals(Status.SUCCESS, action.status());
         action.reset();
@@ -843,30 +1308,65 @@ public class BehaviorTreeTest {
 
     @Test
     void testConditionFailure() {
-        Condition condition = new Condition(() -> false);
+        Condition condition = new Condition(new Condition.ConditionFunction() {
+
+            public boolean check() {
+                return false;
+            }
+        });
         assertEquals(Status.FAILURE, condition.tick());
     }
 
     @Test
     void testSelector() {
-        Action fail = new Action(() -> Status.FAILURE);
-        Action succeed = new Action(() -> Status.SUCCESS);
+        Action fail = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.FAILURE;
+            }
+        });
+        Action succeed = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.SUCCESS;
+            }
+        });
         Selector selector = new Selector(Arrays.asList(fail, succeed));
         assertEquals(Status.SUCCESS, selector.tick());
     }
 
     @Test
     void testSequence() {
-        Action a1 = new Action(() -> Status.SUCCESS);
-        Action a2 = new Action(() -> Status.SUCCESS);
+        Action a1 = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.SUCCESS;
+            }
+        });
+        Action a2 = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.SUCCESS;
+            }
+        });
         Sequence sequence = new Sequence(Arrays.asList(a1, a2));
         assertEquals(Status.SUCCESS, sequence.tick());
     }
 
     @Test
     void testParallel() {
-        Action a1 = new Action(() -> Status.SUCCESS);
-        Action a2 = new Action(() -> Status.FAILURE);
+        Action a1 = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.SUCCESS;
+            }
+        });
+        Action a2 = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.FAILURE;
+            }
+        });
         Parallel parallel = new Parallel(Arrays.asList(a1, a2)).withMinSuccess(1);
         assertEquals(Status.SUCCESS, parallel.tick());
     }
@@ -874,7 +1374,12 @@ public class BehaviorTreeTest {
     @Test
     void testRetry() {
         AtomicInteger count = new AtomicInteger(0);
-        Action a = new Action(() -> count.incrementAndGet() < 3 ? Status.FAILURE : Status.SUCCESS);
+        Action a = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return count.incrementAndGet() < 3 ? Status.FAILURE : Status.SUCCESS;
+            }
+        });
         Retry retry = new Retry(a);
         assertEquals(Status.RUNNING, retry.tick());
         assertEquals(Status.RUNNING, retry.tick());
@@ -884,9 +1389,12 @@ public class BehaviorTreeTest {
     @Test
     void testRepeatN() {
         AtomicInteger count = new AtomicInteger(0);
-        Action a = new Action(() -> {
-            count.incrementAndGet();
-            return Status.SUCCESS;
+        Action a = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                count.incrementAndGet();
+                return Status.SUCCESS;
+            }
         });
         RepeatN repeatN = new RepeatN(a, 3);
         assertEquals(Status.RUNNING, repeatN.tick());
@@ -897,7 +1405,12 @@ public class BehaviorTreeTest {
 
     @Test
     void testWithTimeout() throws InterruptedException {
-        Action running = new Action(() -> Status.RUNNING);
+        Action running = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.RUNNING;
+            }
+        });
         WithTimeout timeout = new WithTimeout(running, Duration.ofMillis(100));
         assertEquals(Status.RUNNING, timeout.tick());
         Thread.sleep(120);
@@ -906,16 +1419,36 @@ public class BehaviorTreeTest {
 
     @Test
     void testComposite() {
-        Condition c1 = new Condition(() -> true);
-        Condition c2 = new Condition(() -> true);
-        Action a = new Action(() -> Status.SUCCESS);
+        Condition c1 = new Condition(new Condition.ConditionFunction() {
+
+            public boolean check() {
+                return true;
+            }
+        });
+        Condition c2 = new Condition(new Condition.ConditionFunction() {
+
+            public boolean check() {
+                return true;
+            }
+        });
+        Action a = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.SUCCESS;
+            }
+        });
         Composite composite = new Composite(Arrays.asList(c1, c2), a);
         assertEquals(Status.SUCCESS, composite.tick());
     }
 
     @Test
     void testLogAndDecorators() {
-        Action a = new Action(() -> Status.SUCCESS);
+        Action a = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.SUCCESS;
+            }
+        });
         Log log = new Log(a, "Action executed");
         AlwaysSuccess alwaysSuccess = new AlwaysSuccess(log);
         assertEquals(Status.SUCCESS, alwaysSuccess.tick());
@@ -923,7 +1456,12 @@ public class BehaviorTreeTest {
 
     @Test
     void testAlwaysFailureDecorator() {
-        Action success = new Action(() -> Status.SUCCESS);
+        Action success = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.SUCCESS;
+            }
+        });
         AlwaysFailure alwaysFailure = new AlwaysFailure(success);
         assertEquals(Status.FAILURE, alwaysFailure.tick());
         alwaysFailure.reset();
@@ -932,7 +1470,12 @@ public class BehaviorTreeTest {
 
     @Test
     void testAlwaysSuccessDecorator() {
-        Action fail = new Action(() -> Status.FAILURE);
+        Action fail = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.FAILURE;
+            }
+        });
         AlwaysSuccess alwaysSuccess = new AlwaysSuccess(fail);
         assertEquals(Status.SUCCESS, alwaysSuccess.tick());
         alwaysSuccess.reset();
@@ -941,20 +1484,35 @@ public class BehaviorTreeTest {
 
     @Test
     void testInvertDecorator() {
-        Action success = new Action(() -> Status.SUCCESS);
+        Action success = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.SUCCESS;
+            }
+        });
         Invert invert = new Invert(success);
         assertEquals(Status.FAILURE, invert.tick());
         invert.reset();
         assertEquals(Status.READY, invert.status());
 
-        Action fail = new Action(() -> Status.FAILURE);
+        Action fail = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.FAILURE;
+            }
+        });
         Invert invert2 = new Invert(fail);
         assertEquals(Status.SUCCESS, invert2.tick());
     }
 
     @Test
     void testForeverDecorator() {
-        Action success = new Action(() -> Status.SUCCESS);
+        Action success = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.SUCCESS;
+            }
+        });
         Forever forever = new Forever(success);
         assertEquals(Status.RUNNING, forever.tick());
         forever.reset();
@@ -964,7 +1522,12 @@ public class BehaviorTreeTest {
     @Test
     void testWhileFailureDecorator() {
         AtomicInteger count = new AtomicInteger(0);
-        Action failTwice = new Action(() -> count.incrementAndGet() < 3 ? Status.FAILURE : Status.SUCCESS);
+        Action failTwice = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return count.incrementAndGet() < 3 ? Status.FAILURE : Status.SUCCESS;
+            }
+        });
         WhileFailure whileFailure = new WhileFailure(failTwice);
         assertEquals(Status.RUNNING, whileFailure.tick());
         assertEquals(Status.RUNNING, whileFailure.tick());
@@ -976,7 +1539,12 @@ public class BehaviorTreeTest {
     @Test
     void testWhileSuccessDecorator() {
         AtomicInteger count = new AtomicInteger(0);
-        Action succeedTwice = new Action(() -> count.incrementAndGet() < 3 ? Status.SUCCESS : Status.FAILURE);
+        Action succeedTwice = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return count.incrementAndGet() < 3 ? Status.SUCCESS : Status.FAILURE;
+            }
+        });
         WhileSuccess whileSuccess = new WhileSuccess(succeedTwice);
         assertEquals(Status.RUNNING, whileSuccess.tick());
         assertEquals(Status.RUNNING, whileSuccess.tick());
@@ -994,7 +1562,12 @@ public class BehaviorTreeTest {
 
     @Test
     void testBehaviorTreeWithRoot() {
-        Action action = new Action(() -> Status.SUCCESS);
+        Action action = new Action(new Action.ActionFunction() {
+
+            public Status run() {
+                return Status.SUCCESS;
+            }
+        });
         BehaviorTree tree = new BehaviorTree(action);
         assertEquals(Status.SUCCESS, tree.tick());
         assertEquals(Status.READY, tree.reset());
