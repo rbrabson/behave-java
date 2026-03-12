@@ -82,12 +82,11 @@ public class WhileSuccess implements Node {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("WhileSuccess (" + status + ")");
+        builder.append("WhileSuccess (").append(status).append(")");
         if (child != null) {
             String[] lines = child.toString().split("\n");
-            builder.append("\n  " + lines[0]);
-            for (int i = 1; i < lines.length; i++) {
-                builder.append("\n  " + lines[i]);
+            for (String line : lines) {
+                builder.append("\n  ").append(line);
             }
         }
         return builder.toString();

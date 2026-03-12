@@ -72,7 +72,7 @@ public class BehaviorTree implements Node {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("BehaviorTree (" + status() + ")");
+        builder.append("BehaviorTree (").append(status()).append(")");
         if (root != null) {
             String[] lines = root.toString().split("\n");
             for (String line : lines) {

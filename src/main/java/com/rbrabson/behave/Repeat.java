@@ -84,7 +84,7 @@ public class Repeat implements Node {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("Repeat (" + status + ")");
+        builder.append("Repeat (").append(status).append(")");
         if (child != null) {
             String[] lines = child.toString().split("\n");
             for (String line : lines) {

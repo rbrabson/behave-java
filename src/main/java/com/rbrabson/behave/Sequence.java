@@ -103,7 +103,7 @@ public class Sequence implements Node {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("Sequence (" + status + ")");
+        builder.append("Sequence (").append(status).append(")");
         for (Node child : children) {
             String[] lines = child.toString().split("\n");
             for (String line : lines) {

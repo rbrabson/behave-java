@@ -85,7 +85,7 @@ public class Retry implements Node {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("Retry (" + status + ")");
+        builder.append("Retry (").append(status).append(")");
         if (child != null) {
             String[] lines = child.toString().split("\n");
             for (String line : lines) {

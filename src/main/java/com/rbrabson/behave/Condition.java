@@ -66,6 +66,6 @@ public class Condition implements Node {
      */
     @Override
     public String toString() {
-        return "Condition (" + status() + ")";
+        return new StringBuilder().append("Condition (").append(status()).append(")").toString();
     }
 }

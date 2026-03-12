@@ -135,7 +135,7 @@ public class Parallel implements Node {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("Parallel (" + status + ")");
+        builder.append("Parallel (").append(status).append(")");
         for (Node child : children) {
             String[] lines = child.toString().split("\n");
             for (String line : lines) {

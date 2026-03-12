@@ -99,7 +99,7 @@ public class Selector implements Node {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("Selector (" + status + ")");
+        builder.append("Selector (").append(status).append(")");
         for (Node child : children) {
             String[] lines = child.toString().split("\n");
             for (String line : lines) {

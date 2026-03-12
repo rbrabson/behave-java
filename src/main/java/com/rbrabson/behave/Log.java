@@ -123,15 +123,17 @@ public class Log implements Node {
     }
 
     /**
-     * Resets the status to READY and resets the child node if it exists.
+     * Resets the status of this node and its child node (if any) to READY.
      *
-     * @return The status of this node after resetting (which will be READY).
+     * @return The status of this node after reset. This is READY if there is no
+     *         child, otherwise it is the status of the child after reset.
      */
     @Override
     public Status reset() {
         status = Status.READY;
-        if (child != null)
-            child.reset();
+        if (child != null) {
+            status = child.reset();
+        }
         return status;
     }
 
@@ -153,12 +155,11 @@ public class Log implements Node {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("Log (" + status + ")");
+        builder.append("Log (").append(status).append(")");
         if (child != null) {
             String[] lines = child.toString().split("\n");
-            builder.append("\n  " + lines[0]);
-            for (int i = 1; i < lines.length; i++) {
-                builder.append("\n  " + lines[i]);
+            for (String line : lines) {
+                builder.append("\n  ").append(line);
             }
         }
         return builder.toString();

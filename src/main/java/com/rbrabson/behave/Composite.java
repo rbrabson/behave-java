@@ -111,7 +111,7 @@ public class Composite implements Node {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("Composite (" + status + ")");
+        builder.append("Composite (").append(status).append(")");
         if (conditions != null) {
             for (Node cond : conditions) {
                 String[] lines = cond.toString().split("\n");
