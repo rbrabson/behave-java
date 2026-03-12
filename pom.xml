@@ -9,6 +9,9 @@
     <name>behave-java</name>
     <description>Java implementation of a flexible behavior tree framework</description>
     <properties>
+        <java.version>1.8</java.version>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
         <maven.compiler.release>8</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <junit.jupiter.version>5.9.3</junit.jupiter.version>
@@ -68,6 +71,10 @@
                         </goals>
                         <configuration>
                             <rules>
+                                <requireJavaVersion>
+                                    <version>[1.8,1.9)</version>
+                                    <message>Maven must run with Java 1.8 for this project.</message>
+                                </requireJavaVersion>
                                 <requireProperty>
                                     <property>maven.compiler.release</property>
                                     <regex>8</regex>
