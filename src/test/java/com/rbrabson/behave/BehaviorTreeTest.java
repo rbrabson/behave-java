@@ -27,12 +27,7 @@ public class BehaviorTreeTest {
     @Test
     void testUsingClassForAction() {
         Counter counter = new Counter(5);
-        Action runTC = new Action(new Action.ActionFunction() {
-
-            public Status run() {
-                return counter.tickUntilDone();
-            }
-        });
+        Action runTC = new Action(() -> counter.tickUntilDone());
         BehaviorTree tree = new BehaviorTree(runTC);
         while (tree.tick() == Status.RUNNING) {
             // Loop until the tree returns SUCCESS
@@ -44,36 +39,16 @@ public class BehaviorTreeTest {
     @Test
     void testInvertAllBranches() {
         // Child returns SUCCESS
-        Invert invertSuccess = new Invert(new Action(new Action.ActionFunction() {
-
-            public Status run() {
-                return Status.SUCCESS;
-            }
-        }));
+        Invert invertSuccess = new Invert(new Action(() -> Status.SUCCESS));
         assertEquals(Status.FAILURE, invertSuccess.tick());
         // Child returns FAILURE
-        Invert invertFailure = new Invert(new Action(new Action.ActionFunction() {
-
-            public Status run() {
-                return Status.FAILURE;
-            }
-        }));
+        Invert invertFailure = new Invert(new Action(() -> Status.FAILURE));
         assertEquals(Status.SUCCESS, invertFailure.tick());
         // Child returns READY
-        Invert invertReady = new Invert(new Action(new Action.ActionFunction() {
-
-            public Status run() {
-                return Status.READY;
-            }
-        }));
+        Invert invertReady = new Invert(new Action(() -> Status.READY));
         assertEquals(Status.READY, invertReady.tick());
         // Child returns null (default case)
-        Invert invertNull = new Invert(new Action(new Action.ActionFunction() {
-
-            public Status run() {
-                return null;
-            }
-        }));
+        Invert invertNull = new Invert(new Action(() -> null));
         assertEquals(Status.SUCCESS, invertNull.tick());
     }
 
