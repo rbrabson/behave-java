@@ -1,11 +1,12 @@
 package com.rbrabson.behave;
 
 import java.time.Duration;
-import java.time.Instant;
+
+import com.rbrabson.time.ElapsedTimer;
 
 /**
  * The WithTimeout class is a decorator node in a behavior tree that adds a
- * timeout to its child node. It continuously ticks the child node until the
+ * timeout to its child node. A null child or duration fails immediately. It continuously ticks the child node until the
  * child returns SUCCESS or FAILURE, or until the specified duration has
  * elapsed. If the child returns RUNNING and the duration has not yet elapsed,
  * the WithTimeout node returns RUNNING. If the duration elapses while the child
@@ -17,14 +18,16 @@ import java.time.Instant;
 public class WithTimeout implements Node {
     private final Node child;
     private final Duration duration;
-    private Instant startTime;
+    private final ElapsedTimer timer = new ElapsedTimer();
+    private boolean timerStarted;
     private Status status = Status.READY;
 
     /**
      * Constructor takes a child node to decorate and a duration for the timeout.
      *
      * @param child    The child node to decorate.
-     * @param duration The duration for the timeout.
+     * @param duration The duration for the timeout; null causes {@link #tick()} to
+     *                 return {@link Status#FAILURE}.
      */
     public WithTimeout(Node child, Duration duration) {
         this.child = child;
@@ -39,21 +42,26 @@ public class WithTimeout implements Node {
      */
     @Override
     public Status tick() {
-        if (child == null) {
+        if (child == null || duration == null) {
             status = Status.FAILURE;
             return status;
         }
-        if (startTime == null) {
-            startTime = Instant.now();
+        if (!timerStarted) {
+            timer.reset();
+            timerStarted = true;
         }
         Status childStatus = child.tick();
+        if (childStatus == null) {
+            status = Status.FAILURE;
+            return status;
+        }
         switch (childStatus) {
         case SUCCESS:
         case FAILURE:
             status = childStatus;
             return status;
         case RUNNING:
-            if (Duration.between(startTime, Instant.now()).compareTo(duration) >= 0) {
+            if (Duration.ofNanos(timer.getElapsedTime()).compareTo(duration) >= 0) {
                 status = Status.FAILURE;
                 return status;
             }
@@ -74,7 +82,7 @@ public class WithTimeout implements Node {
     @Override
     public Status reset() {
         status = Status.READY;
-        startTime = null;
+        timerStarted = false;
         if (child != null)
             child.reset();
         return status;

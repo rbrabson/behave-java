@@ -35,6 +35,10 @@ public class Repeat implements Node {
             return status;
         }
         Status childStatus = child.tick();
+        if (childStatus == null) {
+            status = Status.FAILURE;
+            return status;
+        }
         switch (childStatus) {
         case SUCCESS:
             child.reset();

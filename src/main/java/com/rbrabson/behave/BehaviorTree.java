@@ -34,6 +34,9 @@ public class BehaviorTree implements Node {
             return status;
         }
         status = root.tick();
+        if (status == null) {
+            status = Status.FAILURE;
+        }
         return status;
     }
 

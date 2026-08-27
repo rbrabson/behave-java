@@ -1,10 +1,12 @@
 package com.rbrabson.behave;
 
 import java.util.List;
+import java.util.Collections;
 
 /**
  * The Composite class represents a node in a behavior tree that can have
- * multiple condition nodes and a single child node. The Composite node
+ * multiple condition nodes and a single child node. Null condition references
+ * are skipped, and a null child is treated as absent. The Composite node
  * evaluates its conditions and executes the child node if all conditions
  * succeed. The status of the Composite node is determined by the status of its
  * conditions and child node.
@@ -22,7 +24,7 @@ public class Composite implements Node {
      * @param child      The child node to execute if all conditions succeed.
      */
     public Composite(List<? extends Node> conditions, Node child) {
-        this.conditions = conditions;
+        this.conditions = conditions == null ? Collections.emptyList() : conditions;
         this.child = child;
     }
 
@@ -36,35 +38,45 @@ public class Composite implements Node {
     // results.
     @Override
     public Status tick() {
-        if ((conditions == null || conditions.isEmpty()) && child == null) {
+        if (conditions.isEmpty() && child == null) {
             status = Status.FAILURE;
             return status;
         }
-        if (conditions == null || conditions.isEmpty()) {
-            if (child != null) {
-                status = child.tick();
-                return status;
+        if (conditions.isEmpty()) {
+            status = child.tick();
+            if (status == null) {
+                status = Status.FAILURE;
             }
-            status = Status.FAILURE;
             return status;
+
         }
         for (Node cond : conditions) {
-            Status condStatus = cond.tick();
-            switch (condStatus) {
-            case SUCCESS:
+            if (cond == null) {
                 continue;
-            case RUNNING:
-                status = Status.RUNNING;
-                return status;
-            case FAILURE:
-            case READY:
-            default:
+            }
+            Status condStatus = cond.tick();
+            if (condStatus == null) {
                 status = Status.FAILURE;
                 return status;
+            }
+            switch (condStatus) {
+                case SUCCESS:
+                    continue;
+                case RUNNING:
+                    status = Status.RUNNING;
+                    return status;
+                case FAILURE:
+                case READY:
+                default:
+                    status = Status.FAILURE;
+                    return status;
             }
         }
         if (child != null) {
             status = child.tick();
+            if (status == null) {
+                status = Status.FAILURE;
+            }
             return status;
         }
         status = Status.SUCCESS;
@@ -82,6 +94,9 @@ public class Composite implements Node {
     public Status reset() {
         if (conditions != null) {
             for (Node cond : conditions) {
+                if (cond == null) {
+                    continue;
+                }
                 cond.reset();
             }
         }
@@ -114,6 +129,9 @@ public class Composite implements Node {
         builder.append("Composite (").append(status).append(")");
         if (conditions != null) {
             for (Node cond : conditions) {
+                if (cond == null) {
+                    continue;
+                }
                 String[] lines = cond.toString().split("\n");
                 for (String line : lines) {
                     builder.append("\n  ").append(line);

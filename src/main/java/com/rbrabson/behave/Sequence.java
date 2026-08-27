@@ -1,11 +1,13 @@
 package com.rbrabson.behave;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
  * The Sequence class is a composite node in a behavior tree that evaluates its
- * child nodes in order until one of them returns FAILURE. If a child node
+ * child nodes in order until one of them returns FAILURE. Null child references
+ * are skipped. If a child node
  * returns SUCCESS, the Sequence moves on to the next child. If a child node
  * returns RUNNING, the Sequence returns RUNNING and will continue ticking that
  * child on the next tick. If all child nodes return SUCCESS, the Sequence
@@ -25,7 +27,7 @@ public class Sequence implements Node {
      * @param children The list of child nodes to evaluate.
      */
     public Sequence(List<? extends Node> children) {
-        this.children = children;
+        this.children = children == null ? Collections.<Node>emptyList() : children;
     }
 
     /**
@@ -34,7 +36,7 @@ public class Sequence implements Node {
      * @param children The child nodes to evaluate.
      */
     public Sequence(Node... children) {
-        this(Arrays.asList(children));
+        this(children == null ? Collections.<Node>emptyList() : Arrays.asList(children));
     }
 
     /**
@@ -45,8 +47,12 @@ public class Sequence implements Node {
     @Override
     public Status reset() {
         for (Node child : children) {
+            if (child == null) {
+                continue;
+            }
             child.reset();
         }
+        childrenIndex = 0;
         status = Status.READY;
         return status;
     }
@@ -61,6 +67,10 @@ public class Sequence implements Node {
     public Status tick() {
         while (childrenIndex < children.size()) {
             Node child = children.get(childrenIndex);
+            if (child == null) {
+                childrenIndex++;
+                continue;
+            }
             Status s = child.tick();
             if (s == null) {
                 status = Status.FAILURE;
@@ -105,6 +115,9 @@ public class Sequence implements Node {
         StringBuilder builder = new StringBuilder();
         builder.append("Sequence (").append(status).append(")");
         for (Node child : children) {
+            if (child == null) {
+                continue;
+            }
             String[] lines = child.toString().split("\n");
             for (String line : lines) {
                 builder.append("\n  ").append(line);

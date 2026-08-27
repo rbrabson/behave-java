@@ -6,7 +6,9 @@ package com.rbrabson.behave;
  * status, and providing a string representation. All nodes in the behavior
  * tree, including composite nodes, decorator nodes, and leaf nodes, should
  * implement this interface to ensure consistent behavior and interaction within
- * the tree.
+ * the tree. Implementations should return non-null statuses; composite nodes
+ * skip null child references where possible and treat null child statuses as
+ * failure.
  */
 public interface Node {
     /**

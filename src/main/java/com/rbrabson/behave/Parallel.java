@@ -2,10 +2,12 @@ package com.rbrabson.behave;
 
 import java.util.List;
 import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * The Parallel class is a composite node in a behavior tree that ticks all of
- * its child nodes simultaneously. It returns SUCCESS if at least a specified
+ * its non-null child nodes simultaneously. Null child references are skipped.
+ * It returns SUCCESS if at least a specified
  * number of child nodes return SUCCESS, FAILURE if it's impossible for enough
  * to succeed, and RUNNING otherwise. This node is useful for creating behaviors
  * that require multiple conditions to be met or multiple actions to be
@@ -24,14 +26,24 @@ public class Parallel implements Node {
      * @param children The list of child nodes.
      */
     public Parallel(List<? extends Node> children) {
-        this.children = children;
-        this.minSuccessCount = children.size();
+        this.children = children == null ? Collections.<Node>emptyList() : children;
+        this.minSuccessCount = nonNullCount(this.children);
         if (minSuccessCount <= 0) {
             this.minSuccessCount = 1;
         }
-        if (minSuccessCount > children.size()) {
-            this.minSuccessCount = children.size();
+        if (minSuccessCount > nonNullCount(this.children)) {
+            this.minSuccessCount = nonNullCount(this.children);
         }
+    }
+
+    private static int nonNullCount(List<? extends Node> nodes) {
+        int count = 0;
+        for (Node node : nodes) {
+            if (node != null) {
+                count++;
+            }
+        }
+        return count;
     }
 
     /**
@@ -41,14 +53,14 @@ public class Parallel implements Node {
      * @param children The array of child nodes.
      */
     public Parallel(Node... children) {
-        this(Arrays.asList(children));
+        this(children == null ? Collections.<Node>emptyList() : Arrays.asList(children));
     }
 
     public Parallel withMinSuccess(int minSuccessCount) {
         if (minSuccessCount <= 0) {
             this.minSuccessCount = 1;
         } else {
-            this.minSuccessCount = Math.min(minSuccessCount, children.size());
+            this.minSuccessCount = Math.min(minSuccessCount, nonNullCount(children));
         }
         return this;
     }
@@ -61,6 +73,9 @@ public class Parallel implements Node {
     @Override
     public Status reset() {
         for (Node child : children) {
+            if (child == null) {
+                continue;
+            }
             child.reset();
         }
         status = Status.READY;
@@ -80,6 +95,9 @@ public class Parallel implements Node {
 
         int successCount = 0, runningCount = 0;
         for (Node child : children) {
+            if (child == null) {
+                continue;
+            }
             Status s = child.tick();
             if (s == null) {
                 // treat null as failure
@@ -135,6 +153,9 @@ public class Parallel implements Node {
         StringBuilder builder = new StringBuilder();
         builder.append("Parallel (").append(status).append(")");
         for (Node child : children) {
+            if (child == null) {
+                continue;
+            }
             String[] lines = child.toString().split("\n");
             for (String line : lines) {
                 builder.append("\n  ").append(line);

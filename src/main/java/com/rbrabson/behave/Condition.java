@@ -8,6 +8,7 @@ package com.rbrabson.behave;
  */
 public class Condition implements Node {
     private final ConditionFunction check;
+    private Status status = Status.READY;
 
     /**
      * Functional interface for the condition function that returns a Status.
@@ -33,7 +34,12 @@ public class Condition implements Node {
     // status based on its result.
     @Override
     public Status tick() {
-        return status();
+        if (check == null) {
+            status = Status.FAILURE;
+        } else {
+            status = check.check() ? Status.SUCCESS : Status.FAILURE;
+        }
+        return status;
     }
 
     /**
@@ -43,6 +49,7 @@ public class Condition implements Node {
      */
     @Override
     public Status reset() {
+        status = Status.READY;
         return Status.READY;
     }
 
@@ -53,10 +60,7 @@ public class Condition implements Node {
      */
     @Override
     public Status status() {
-        if (check == null) {
-            return Status.FAILURE;
-        }
-        return check.check() ? Status.SUCCESS : Status.FAILURE;
+        return status;
     }
 
     /**
@@ -66,6 +70,6 @@ public class Condition implements Node {
      */
     @Override
     public String toString() {
-        return "Condition (" + status() + ")";
+        return "Condition (" + status + ")";
     }
 }

@@ -1,11 +1,13 @@
 package com.rbrabson.behave;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
  * The Selector class is a composite node in a behavior tree that evaluates its
- * child nodes in order until one of them returns SUCCESS. If a child node
+ * child nodes in order until one of them returns SUCCESS. Null child references
+ * are skipped. If a child node
  * returns FAILURE, the Selector moves on to the next child. If a child node
  * returns RUNNING, the Selector returns RUNNING and will continue ticking that
  * child on the next tick. If all child nodes return FAILURE, the Selector
@@ -23,7 +25,7 @@ public class Selector implements Node {
      * @param children The list of child nodes to evaluate.
      */
     public Selector(List<? extends Node> children) {
-        this.children = children;
+        this.children = children == null ? Collections.<Node>emptyList() : children;
     }
 
     /**
@@ -32,7 +34,7 @@ public class Selector implements Node {
      * @param children The array of child nodes to evaluate.
      */
     public Selector(Node... children) {
-        this(Arrays.asList(children));
+        this(children == null ? Collections.<Node>emptyList() : Arrays.asList(children));
     }
 
     /**
@@ -43,6 +45,9 @@ public class Selector implements Node {
     @Override
     public Status reset() {
         for (Node child : children) {
+            if (child == null) {
+                continue;
+            }
             child.reset();
         }
         status = Status.READY;
@@ -58,6 +63,9 @@ public class Selector implements Node {
     @Override
     public Status tick() {
         for (Node child : children) {
+            if (child == null) {
+                continue;
+            }
             Status s = child.tick();
             if (s == null) {
                 status = Status.FAILURE;
@@ -101,6 +109,9 @@ public class Selector implements Node {
         StringBuilder builder = new StringBuilder();
         builder.append("Selector (").append(status).append(")");
         for (Node child : children) {
+            if (child == null) {
+                continue;
+            }
             String[] lines = child.toString().split("\n");
             for (String line : lines) {
                 builder.append("\n  ").append(line);
