@@ -47,10 +47,8 @@ public class Parallel implements Node {
     public Parallel withMinSuccess(int minSuccessCount) {
         if (minSuccessCount <= 0) {
             this.minSuccessCount = 1;
-        } else if (minSuccessCount > children.size()) {
-            this.minSuccessCount = children.size();
         } else {
-            this.minSuccessCount = minSuccessCount;
+            this.minSuccessCount = Math.min(minSuccessCount, children.size());
         }
         return this;
     }

@@ -94,6 +94,6 @@ public class Action implements Node {
      */
     @Override
     public String toString() {
-        return new StringBuilder().append("Action (").append(status).append(")").toString();
+        return "Action (" + status + ")";
     }
 }

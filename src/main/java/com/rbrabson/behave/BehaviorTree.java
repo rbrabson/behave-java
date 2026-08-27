@@ -8,7 +8,7 @@ package com.rbrabson.behave;
  * execution cycle.
  */
 public class BehaviorTree implements Node {
-    private Node root;
+    private final Node root;
     private Status status;
 
     /**

@@ -1,6 +1,5 @@
 package com.rbrabson.behave;
 
-import java.sql.Time;
 import java.util.concurrent.TimeUnit;
 
 import com.rbrabson.time.ElapsedTimer;
@@ -15,7 +14,7 @@ import com.rbrabson.time.ElapsedTimer;
 public class Timer implements Node {
     private final Node child;
     private Status status = Status.READY;
-    private ElapsedTimer timer;
+    private final ElapsedTimer timer;
     private boolean timerStarted = false;
 
     /**
